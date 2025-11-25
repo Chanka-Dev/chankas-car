@@ -9,10 +9,10 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel" alt="Laravel">
-  <img src="https://img.shields.io/badge/PHP-8.1+-777BB4?style=for-the-badge&logo=php" alt="PHP">
-  <img src="https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql" alt="MySQL">
-  <img src="https://img.shields.io/badge/AdminLTE-3.x-0073e6?style=for-the-badge" alt="AdminLTE">
+  <img src="https://img.shields.io/badge/Laravel-10.x-FF2D20?style=for-the-badge&logo=laravel" alt="Laravel">
+  <img src="https://img.shields.io/badge/PHP-8.1.33-777BB4?style=for-the-badge&logo=php" alt="PHP">
+  <img src="https://img.shields.io/badge/MySQL-8.0.44-4479A1?style=for-the-badge&logo=mysql" alt="MySQL">
+  <img src="https://img.shields.io/badge/AdminLTE-3.15-0073e6?style=for-the-badge" alt="AdminLTE">
 </p>
 
 ---
@@ -104,10 +104,11 @@ Chankas Car es un sistema web completo diseñado para gestionar eficientemente l
 ## 🛠️ Tecnologías Utilizadas
 
 ### Backend
-- **Laravel 11.x** - Framework PHP
-- **MySQL 8.0** - Base de datos
+- **Laravel 10.49.1** - Framework PHP
+- **PHP 8.1.33** - Lenguaje de programación
+- **MySQL 8.0.44** - Base de datos
 - **Laravel Breeze** - Autenticación
-- **Spatie Laravel Backup** - Sistema de backups
+- **Spatie Laravel Backup 8.8** - Sistema de backups
 
 ### Frontend
 - **AdminLTE 3.x** - Template de administración
@@ -168,10 +169,12 @@ chankascar/
 ## 🚀 Instalación
 
 ### Requisitos Previos
-- PHP >= 8.1
-- Composer
+- PHP >= 8.1.33
+- Composer >= 2.0
 - Node.js >= 16.x y NPM
-- MySQL >= 8.0
+- MySQL >= 8.0.44
+- Servidor web (Apache/Nginx)
+- Sistema operativo: Linux (Probado en Xubuntu 22.04 LTS)
 - Extensiones PHP: OpenSSL, PDO, Mbstring, Tokenizer, XML, Ctype, JSON, BCMath, GD
 
 ### Pasos de Instalación
