@@ -1,5 +1,7 @@
 # 🚗 Chankas Car - Sistema de Gestión de Taller GNV
 
+> **English version available**: [README.en.md](README.en.md)
+
 <p align="center">
   <img src="public/favicon.png" alt="Chankas Car Logo" width="150">
 </p>
