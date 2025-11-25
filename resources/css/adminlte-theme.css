@@ -1,0 +1,285 @@
+/**
+ * Chankas Car - Tema Personalizado
+ * Colores corporativos basados en el logo
+ */
+
+:root {
+  /* Colores Principales */
+  --primary-dark: #1a3a47;      /* Azul oscuro del logo */
+  --primary-medium: #2d5566;    /* Tono intermedio */
+  --primary-light: #6db3c8;     /* Azul claro del logo */
+  --primary-lighter: #a8d5e2;   /* Azul muy claro */
+  
+  /* Acentos */
+  --accent-yellow: #fbc02d;     /* Amarillo GNV */
+  --accent-yellow-light: #ffd54f;
+  
+  /* Neutros */
+  --white: #ffffff;
+  --gray-100: #f8f9fa;
+  --gray-200: #e9ecef;
+  --gray-300: #dee2e6;
+  --gray-600: #6c757d;
+  --gray-800: #343a40;
+}
+
+/* ========================================
+   SIDEBAR (Barra Lateral)
+   ======================================== */
+.main-sidebar {
+  background: linear-gradient(180deg, var(--primary-dark) 0%, #0f2731 100%) !important;
+}
+
+.brand-link {
+  background-color: var(--primary-dark) !important;
+  border-bottom: 3px solid var(--accent-yellow) !important;
+  color: var(--white) !important;
+}
+
+.brand-link:hover {
+  opacity: 0.9;
+}
+
+/* Items del menú */
+.nav-sidebar .nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.nav-sidebar .nav-link:hover {
+  background-color: rgba(109, 179, 200, 0.15) !important;
+  color: var(--white) !important;
+}
+
+.nav-sidebar .nav-link.active {
+  background-color: var(--primary-medium) !important;
+  color: var(--white) !important;
+  border-left: 4px solid var(--accent-yellow) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.nav-sidebar .nav-header {
+  color: var(--primary-light) !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+/* ========================================
+   NAVBAR (Barra Superior)
+   ======================================== */
+.main-header.navbar {
+  background-color: var(--white) !important;
+  border-bottom: 3px solid var(--primary-light) !important;
+}
+
+/* ========================================
+   BOTONES
+   ======================================== */
+.btn-primary {
+  background-color: var(--primary-medium) !important;
+  border-color: var(--primary-medium) !important;
+  color: var(--white) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+  box-shadow: 0 4px 8px rgba(26, 58, 71, 0.3);
+}
+
+.btn-success {
+  background-color: #28a745 !important;
+  border-color: #28a745 !important;
+}
+
+.btn-warning {
+  background-color: var(--accent-yellow) !important;
+  border-color: var(--accent-yellow) !important;
+  color: var(--primary-dark) !important;
+}
+
+.btn-info {
+  background-color: var(--primary-light) !important;
+  border-color: var(--primary-light) !important;
+  color: var(--primary-dark) !important;
+}
+
+/* ========================================
+   TARJETAS (Cards)
+   ======================================== */
+.card {
+  border-top: 3px solid var(--primary-light);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.card-header {
+  background-color: var(--gray-100) !important;
+  color: var(--primary-dark) !important;
+  border-bottom: 2px solid var(--primary-light) !important;
+  font-weight: 600;
+}
+
+.card-primary .card-header {
+  background-color: var(--primary-medium) !important;
+  color: var(--white) !important;
+}
+
+/* ========================================
+   SMALL BOXES (Dashboard)
+   ======================================== */
+.small-box {
+  border-radius: 6px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.small-box.bg-info {
+  background: linear-gradient(135deg, var(--primary-light) 0%, #5a9fb5 100%) !important;
+}
+
+.small-box.bg-success {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+}
+
+.small-box.bg-warning {
+  background: linear-gradient(135deg, var(--accent-yellow) 0%, var(--accent-yellow-light) 100%) !important;
+}
+
+.small-box.bg-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%) !important;
+}
+
+.small-box .icon {
+  opacity: 0.3;
+}
+
+/* ========================================
+   INFO BOX
+   ======================================== */
+.info-box {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid var(--primary-light);
+}
+
+.info-box.bg-gradient-primary {
+  background: linear-gradient(135deg, var(--primary-medium) 0%, var(--primary-light) 100%) !important;
+}
+
+/* ========================================
+   TABLAS
+   ======================================== */
+.table thead th {
+  background-color: var(--primary-medium) !important;
+  color: var(--white) !important;
+  border-bottom: 2px solid var(--accent-yellow) !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.3px;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(109, 179, 200, 0.05);
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(109, 179, 200, 0.1);
+}
+
+/* ========================================
+   BADGES
+   ======================================== */
+.badge-primary {
+  background-color: var(--primary-medium) !important;
+}
+
+.badge-info {
+  background-color: var(--primary-light) !important;
+  color: var(--primary-dark) !important;
+}
+
+/* ========================================
+   FORMULARIOS
+   ======================================== */
+.form-control:focus {
+  border-color: var(--primary-light) !important;
+  box-shadow: 0 0 0 0.2rem rgba(109, 179, 200, 0.25) !important;
+}
+
+/* ========================================
+   ENLACES
+   ======================================== */
+a {
+  color: var(--primary-medium) !important;
+}
+
+a:hover {
+  color: var(--primary-dark) !important;
+}
+
+/* ========================================
+   CONTENT HEADER
+   ======================================== */
+.content-header {
+  padding: 15px 0.5rem;
+}
+
+.content-header h1 {
+  color: var(--primary-dark) !important;
+  font-weight: 600;
+}
+
+/* ========================================
+   DROPDOWN MENU
+   ======================================== */
+.dropdown-menu {
+  border-top: 3px solid var(--primary-light);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-item:hover {
+  background-color: var(--gray-100) !important;
+  color: var(--primary-dark) !important;
+}
+
+/* ========================================
+   SCROLLBAR PERSONALIZADO
+   ======================================== */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--primary-light);
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-yellow);
+}
+
+/* ========================================
+   ALERTAS
+   ======================================== */
+.alert-info {
+  background-color: rgba(109, 179, 200, 0.1);
+  border-left: 4px solid var(--primary-light);
+  color: var(--primary-dark);
+}
+
+.alert-success {
+  border-left: 4px solid #28a745;
+}
+
+.alert-warning {
+  border-left: 4px solid var(--accent-yellow);
+}
+
+.alert-danger {
+  border-left: 4px solid #dc3545;
+}
