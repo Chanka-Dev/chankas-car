@@ -31,6 +31,17 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
   - Página de error 429 personalizada con temporizador
   - Bloqueo temporal automático de IP sospechosas
 
+- 🔒 **Validación mejorada de inputs con Regex**
+  - **Prevención de SQL Injection**: Validación estricta de caracteres
+  - **Prevención de XSS**: Bloqueo de scripts maliciosos
+  - **Clientes**: Placas (A-Z0-9-), Teléfono (+0-9()-espacios)
+  - **Empleados**: CI (solo números), Nombres/Apellidos (letras con ñ/tildes)
+  - **Servicios**: Nombres validados, límites numéricos (max 999,999.99 Bs)
+  - **Inventario**: Nombres seguros, stocks limitados (max 999,999)
+  - **Trabajos**: Observaciones sanitizadas, fechas lógicas, límites de servicios/piezas
+  - Mensajes de error personalizados y descriptivos
+  - Conversión automática de placas a mayúsculas
+
 ### Mejorado
 - 🛡️ **Validación de eliminación con integridad referencial**
   - **Clientes**: No permite eliminar si tiene trabajos asociados

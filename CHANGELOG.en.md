@@ -31,6 +31,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - Custom 429 error page with countdown timer
   - Automatic temporary blocking of suspicious IPs
 
+- 🔒 **Enhanced input validation with Regex**
+  - **SQL Injection prevention**: Strict character validation
+  - **XSS prevention**: Malicious script blocking
+  - **Customers**: License plates (A-Z0-9-), Phone (+0-9()-spaces)
+  - **Employees**: ID (numbers only), Names/Surnames (letters with ñ/accents)
+  - **Services**: Validated names, numeric limits (max 999,999.99 Bs)
+  - **Inventory**: Safe names, limited stocks (max 999,999)
+  - **Work Orders**: Sanitized observations, logical dates, service/part limits
+  - Custom and descriptive error messages
+  - Automatic uppercase conversion for license plates
+
 ### Improved
 - 🛡️ **Delete validation with referential integrity**
   - **Customers**: Prevents deletion if has associated work orders

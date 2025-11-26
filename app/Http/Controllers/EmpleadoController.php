@@ -37,11 +37,37 @@ class EmpleadoController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'ci' => 'required|string|max:20|unique:empleados,ci',
-            'nombre' => 'required|string|max:100',
-            'apellido' => 'required|string|max:100',
-            'telefono' => 'nullable|string|max:20',
+            'ci' => [
+                'required',
+                'string',
+                'max:20',
+                'unique:empleados,ci',
+                'regex:/^[0-9]+$/', // Solo números
+            ],
+            'nombre' => [
+                'required',
+                'string',
+                'max:100',
+                'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/', // Solo letras y espacios (español)
+            ],
+            'apellido' => [
+                'required',
+                'string',
+                'max:100',
+                'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
+            ],
+            'telefono' => [
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^[0-9+\-\s()]+$/',
+            ],
             'id_cargo' => 'required|exists:cargos,id_cargo',
+        ], [
+            'ci.regex' => 'El CI solo puede contener números.',
+            'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
+            'apellido.regex' => 'El apellido solo puede contener letras y espacios.',
+            'telefono.regex' => 'El teléfono solo puede contener números y los símbolos: + - ( ) espacios.',
         ]);
 
         Empleado::create($request->all());
@@ -73,11 +99,37 @@ class EmpleadoController extends Controller
     public function update(Request $request, Empleado $empleado)
     {
         $request->validate([
-            'ci' => 'required|string|max:20|unique:empleados,ci,' . $empleado->id_empleado . ',id_empleado',
-            'nombre' => 'required|string|max:100',
-            'apellido' => 'required|string|max:100',
-            'telefono' => 'nullable|string|max:20',
+            'ci' => [
+                'required',
+                'string',
+                'max:20',
+                'unique:empleados,ci,' . $empleado->id_empleado . ',id_empleado',
+                'regex:/^[0-9]+$/',
+            ],
+            'nombre' => [
+                'required',
+                'string',
+                'max:100',
+                'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
+            ],
+            'apellido' => [
+                'required',
+                'string',
+                'max:100',
+                'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
+            ],
+            'telefono' => [
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^[0-9+\-\s()]+$/',
+            ],
             'id_cargo' => 'required|exists:cargos,id_cargo',
+        ], [
+            'ci.regex' => 'El CI solo puede contener números.',
+            'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
+            'apellido.regex' => 'El apellido solo puede contener letras y espacios.',
+            'telefono.regex' => 'El teléfono solo puede contener números y los símbolos: + - ( ) espacios.',
         ]);
 
         $empleado->update($request->all());

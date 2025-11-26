@@ -30,9 +30,18 @@ class ServicioController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nombre' => 'required|string|max:150',
-            'costo' => 'required|numeric|min:0',
-            'comision' => 'required|numeric|min:0',
+            'nombre' => [
+                'required',
+                'string',
+                'max:150',
+                'regex:/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-\.(),]+$/', // Letras, números, espacios y puntuación básica
+            ],
+            'costo' => 'required|numeric|min:0|max:999999.99',
+            'comision' => 'required|numeric|min:0|max:999999.99',
+        ], [
+            'nombre.regex' => 'El nombre del servicio contiene caracteres no permitidos.',
+            'costo.max' => 'El costo no puede exceder 999,999.99 Bs.',
+            'comision.max' => 'La comisión no puede exceder 999,999.99 Bs.',
         ]);
 
         Servicio::create($request->all());
@@ -56,13 +65,22 @@ class ServicioController extends Controller
     public function update(Request $request, Servicio $servicio)
     {
         $request->validate([
-            'nombre' => 'required|string|max:150',
-            'costo' => 'required|numeric|min:0',
-            'comision' => 'required|numeric|min:0',
+            'nombre' => [
+                'required',
+                'string',
+                'max:150',
+                'regex:/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-\.(),]+$/',
+            ],
+            'costo' => 'required|numeric|min:0|max:999999.99',
+            'comision' => 'required|numeric|min:0|max:999999.99',
             'piezas' => 'nullable|array',
             'piezas.*.id_inventario' => 'required|exists:inventario,id_inventario',
-            'piezas.*.cantidad_base' => 'required|integer|min:1',
+            'piezas.*.cantidad_base' => 'required|integer|min:1|max:9999',
             'piezas.*.es_opcional' => 'nullable|boolean',
+        ], [
+            'nombre.regex' => 'El nombre del servicio contiene caracteres no permitidos.',
+            'costo.max' => 'El costo no puede exceder 999,999.99 Bs.',
+            'comision.max' => 'La comisión no puede exceder 999,999.99 Bs.',
         ]);
 
         $servicio->update($request->only(['nombre', 'costo', 'comision']));

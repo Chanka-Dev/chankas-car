@@ -51,11 +51,28 @@ class ClienteController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'placas' => 'required|string|max:20',
-            'telefono' => 'nullable|string|max:20',
+            'placas' => [
+                'required',
+                'string',
+                'max:20',
+                'regex:/^[A-Z0-9\-]+$/', // Solo mayúsculas, números y guiones
+            ],
+            'telefono' => [
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^[0-9+\-\s()]+$/', // Solo números, +, -, espacios, paréntesis
+            ],
+        ], [
+            'placas.regex' => 'Las placas solo pueden contener letras mayúsculas, números y guiones.',
+            'telefono.regex' => 'El teléfono solo puede contener números y los símbolos: + - ( ) espacios.',
         ]);
 
-        Cliente::create($request->all());
+        // Convertir placas a mayúsculas por si acaso
+        $data = $request->all();
+        $data['placas'] = strtoupper($data['placas']);
+        
+        Cliente::create($data);
 
         return redirect()->route('clientes.index')
             ->with('success', 'Cliente creado exitosamente.');
@@ -83,11 +100,27 @@ class ClienteController extends Controller
     public function update(Request $request, Cliente $cliente)
     {
         $request->validate([
-            'placas' => 'required|string|max:20',
-            'telefono' => 'nullable|string|max:20',
+            'placas' => [
+                'required',
+                'string',
+                'max:20',
+                'regex:/^[A-Z0-9\-]+$/',
+            ],
+            'telefono' => [
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^[0-9+\-\s()]+$/',
+            ],
+        ], [
+            'placas.regex' => 'Las placas solo pueden contener letras mayúsculas, números y guiones.',
+            'telefono.regex' => 'El teléfono solo puede contener números y los símbolos: + - ( ) espacios.',
         ]);
 
-        $cliente->update($request->all());
+        $data = $request->all();
+        $data['placas'] = strtoupper($data['placas']);
+        
+        $cliente->update($data);
 
         return redirect()->route('clientes.index')
             ->with('success', 'Cliente actualizado exitosamente.');

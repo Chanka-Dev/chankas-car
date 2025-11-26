@@ -28,16 +28,34 @@ class InventarioController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nombre' => 'required|string|max:150',
-            'descripcion' => 'nullable|string',
+            'nombre' => [
+                'required',
+                'string',
+                'max:150',
+                'regex:/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-\.(),\/]+$/',
+            ],
+            'descripcion' => [
+                'nullable',
+                'string',
+                'max:500',
+                'regex:/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-\.,:;()\n\r]+$/',
+            ],
             'unidad_medida' => 'required|in:unidad,metro,kilo,litro,caja,par',
-            'precio_compra' => 'required|numeric|min:0',
-            'precio_venta' => 'required|numeric|min:0',
-            'stock_actual' => 'required|integer|min:0',
-            'stock_minimo' => 'required|integer|min:0',
+            'precio_compra' => 'required|numeric|min:0|max:999999.99',
+            'precio_venta' => 'required|numeric|min:0|max:999999.99',
+            'stock_actual' => 'required|integer|min:0|max:999999',
+            'stock_minimo' => 'required|integer|min:0|max:9999',
             'tipo_stock' => 'required|in:contable,pregunta',
             'id_proveedor' => 'nullable|exists:proveedores,id_proveedor',
-            'fecha_ingreso' => 'nullable|date',
+            'fecha_ingreso' => 'nullable|date|before_or_equal:today',
+        ], [
+            'nombre.regex' => 'El nombre del item contiene caracteres no permitidos.',
+            'descripcion.regex' => 'La descripción contiene caracteres no permitidos.',
+            'precio_compra.max' => 'El precio de compra no puede exceder 999,999.99 Bs.',
+            'precio_venta.max' => 'El precio de venta no puede exceder 999,999.99 Bs.',
+            'stock_actual.max' => 'El stock actual no puede exceder 999,999 unidades.',
+            'stock_minimo.max' => 'El stock mínimo no puede exceder 9,999 unidades.',
+            'fecha_ingreso.before_or_equal' => 'La fecha de ingreso no puede ser futura.',
         ]);
 
         Inventario::create($request->all());
@@ -60,16 +78,34 @@ class InventarioController extends Controller
     public function update(Request $request, Inventario $inventario)
     {
         $request->validate([
-            'nombre' => 'required|string|max:150',
-            'descripcion' => 'nullable|string',
+            'nombre' => [
+                'required',
+                'string',
+                'max:150',
+                'regex:/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-\.(),\/]+$/',
+            ],
+            'descripcion' => [
+                'nullable',
+                'string',
+                'max:500',
+                'regex:/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-\.,:;()\n\r]+$/',
+            ],
             'unidad_medida' => 'required|in:unidad,metro,kilo,litro,caja,par',
-            'precio_compra' => 'required|numeric|min:0',
-            'precio_venta' => 'required|numeric|min:0',
-            'stock_actual' => 'required|integer|min:0',
-            'stock_minimo' => 'required|integer|min:0',
+            'precio_compra' => 'required|numeric|min:0|max:999999.99',
+            'precio_venta' => 'required|numeric|min:0|max:999999.99',
+            'stock_actual' => 'required|integer|min:0|max:999999',
+            'stock_minimo' => 'required|integer|min:0|max:9999',
             'tipo_stock' => 'required|in:contable,pregunta',
             'id_proveedor' => 'nullable|exists:proveedores,id_proveedor',
-            'fecha_ingreso' => 'nullable|date',
+            'fecha_ingreso' => 'nullable|date|before_or_equal:today',
+        ], [
+            'nombre.regex' => 'El nombre del item contiene caracteres no permitidos.',
+            'descripcion.regex' => 'La descripción contiene caracteres no permitidos.',
+            'precio_compra.max' => 'El precio de compra no puede exceder 999,999.99 Bs.',
+            'precio_venta.max' => 'El precio de venta no puede exceder 999,999.99 Bs.',
+            'stock_actual.max' => 'El stock actual no puede exceder 999,999 unidades.',
+            'stock_minimo.max' => 'El stock mínimo no puede exceder 9,999 unidades.',
+            'fecha_ingreso.before_or_equal' => 'La fecha de ingreso no puede ser futura.',
         ]);
 
         $inventario->update($request->all());
