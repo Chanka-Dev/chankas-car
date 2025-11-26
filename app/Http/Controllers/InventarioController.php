@@ -80,8 +80,28 @@ class InventarioController extends Controller
 
     public function destroy(Inventario $inventario)
     {
-        $inventario->delete();
-        return redirect()->route('inventarios.index')
-            ->with('success', 'Item eliminado del inventario exitosamente.');
+        // Verificar si está usado en trabajos
+        $cantidadTrabajos = \DB::table('trabajo_inventario')
+            ->where('id_inventario', $inventario->id_inventario)
+            ->count();
+        
+        if ($cantidadTrabajos > 0) {
+            return redirect()->route('inventarios.index')
+                ->with('error', "No se puede eliminar '{$inventario->nombre}' porque está registrado en {$cantidadTrabajos} trabajo(s). Por seguridad, los items con historial de uso no pueden eliminarse.");
+        }
+
+        try {
+            // Eliminar relaciones con servicios (estas sí se pueden eliminar)
+            \DB::table('servicio_inventario')
+                ->where('id_inventario', $inventario->id_inventario)
+                ->delete();
+            
+            $inventario->delete();
+            return redirect()->route('inventarios.index')
+                ->with('success', 'Item eliminado del inventario exitosamente.');
+        } catch (\Exception $e) {
+            return redirect()->route('inventarios.index')
+                ->with('error', 'Error al eliminar el item: ' . $e->getMessage());
+        }
     }
 }

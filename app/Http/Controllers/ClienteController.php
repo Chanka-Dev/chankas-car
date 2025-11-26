@@ -98,13 +98,21 @@ class ClienteController extends Controller
      */
     public function destroy(Cliente $cliente)
     {
+        // Verificar si tiene trabajos asociados
+        $cantidadTrabajos = $cliente->trabajos()->count();
+        
+        if ($cantidadTrabajos > 0) {
+            return redirect()->route('clientes.index')
+                ->with('error', "No se puede eliminar el cliente con placa '{$cliente->placas}' porque tiene {$cantidadTrabajos} trabajo(s) asociado(s). Por seguridad, los clientes con historial no pueden eliminarse.");
+        }
+
         try {
             $cliente->delete();
             return redirect()->route('clientes.index')
                 ->with('success', 'Cliente eliminado exitosamente.');
         } catch (\Exception $e) {
             return redirect()->route('clientes.index')
-                ->with('error', 'No se puede eliminar el cliente porque tiene trabajos asociados.');
+                ->with('error', 'Error al eliminar el cliente: ' . $e->getMessage());
         }
     }
 }

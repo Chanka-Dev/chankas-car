@@ -38,6 +38,12 @@ class Servicio extends Model
         return $this->hasMany(Trabajo::class, 'id_servicio', 'id_servicio');
     }
 
+    // Relación: Un servicio puede estar en muchos trabajos (a través de trabajo_servicios)
+    public function trabajoServicios()
+    {
+        return $this->hasMany(TrabajoServicio::class, 'id_servicio', 'id_servicio');
+    }
+
     // Relación: Un servicio tiene muchos items de inventario asociados
     public function servicioInventarios()
     {

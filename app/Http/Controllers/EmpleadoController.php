@@ -91,13 +91,31 @@ class EmpleadoController extends Controller
      */
     public function destroy(Empleado $empleado)
     {
+        // Verificar si tiene trabajos asociados
+        $cantidadTrabajos = $empleado->trabajos()->count();
+        
+        if ($cantidadTrabajos > 0) {
+            return redirect()->route('empleados.index')
+                ->with('error', "No se puede eliminar al empleado '{$empleado->nombre} {$empleado->apellido}' porque tiene {$cantidadTrabajos} trabajo(s) asociado(s). Por seguridad, los técnicos con historial no pueden eliminarse.");
+        }
+
+        // Verificar si tiene pagos registrados
+        $cantidadPagos = \DB::table('pagos')
+            ->where('id_empleado', $empleado->id_empleado)
+            ->count();
+        
+        if ($cantidadPagos > 0) {
+            return redirect()->route('empleados.index')
+                ->with('error', "No se puede eliminar al empleado '{$empleado->nombre} {$empleado->apellido}' porque tiene {$cantidadPagos} pago(s) registrado(s). Por seguridad, los técnicos con historial no pueden eliminarse.");
+        }
+
         try {
             $empleado->delete();
             return redirect()->route('empleados.index')
                 ->with('success', 'Empleado eliminado exitosamente.');
         } catch (\Exception $e) {
             return redirect()->route('empleados.index')
-                ->with('error', 'No se puede eliminar el empleado porque tiene trabajos asociados.');
+                ->with('error', 'Error al eliminar el empleado: ' . $e->getMessage());
         }
     }
 }

@@ -370,6 +370,24 @@
             template = template.replace(/INDEX/g, servicioIndex);
             $('#servicios-container').append(template);
             $('#alert-sin-servicios').hide();
+            
+            // Inicializar Select2 en el nuevo select de servicio
+            let newSelect = $('#servicios-container .servicio-item').last().find('.servicio-select');
+            newSelect.select2({
+                theme: 'bootstrap4',
+                placeholder: 'Buscar servicio...',
+                allowClear: true,
+                width: '100%',
+                language: {
+                    noResults: function() {
+                        return "No se encontraron resultados";
+                    },
+                    searching: function() {
+                        return "Buscando...";
+                    }
+                }
+            });
+            
             servicioIndex++;
         });
 
@@ -547,6 +565,44 @@
             this.value = this.value.toUpperCase();
         });
 
+        // Autocompletar teléfono cuando se escribe la placa
+        let timeoutPlaca = null;
+        $('#placas').on('input', function() {
+            let placa = $(this).val().trim();
+            
+            // Limpiar timeout anterior
+            clearTimeout(timeoutPlaca);
+            
+            if (placa.length >= 3) {
+                // Esperar 500ms después de que el usuario deje de escribir
+                timeoutPlaca = setTimeout(function() {
+                    $.ajax({
+                        url: '{{ route("trabajos.buscar-cliente") }}',
+                        type: 'POST',
+                        data: {
+                            placas: placa,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.existe) {
+                                $('#telefono').val(response.telefono);
+                                $('#info-telefono').html('<i class="fas fa-check-circle text-success"></i> Cliente encontrado - teléfono autocargado');
+                            } else {
+                                $('#telefono').val('');
+                                $('#info-telefono').html('<i class="fas fa-info-circle text-info"></i> Cliente nuevo - ingrese el teléfono');
+                            }
+                        },
+                        error: function() {
+                            console.log('Error al buscar cliente');
+                        }
+                    });
+                }, 500);
+            } else {
+                $('#telefono').val('');
+                $('#info-telefono').text('Opcional');
+            }
+        });
+
         // Validación antes de enviar el formulario
         $('#form-trabajo').on('submit', function(e) {
             if ($('.servicio-item').length === 0) {
@@ -561,4 +617,16 @@
 
 @section('css')
     @vite('resources/css/adminlte-theme.css')
+    <style>
+        /* Ajustar Select2 para Bootstrap 4 */
+        .select2-container--bootstrap4 .select2-selection--single {
+            height: calc(2.25rem + 2px) !important;
+        }
+        .select2-container--bootstrap4 .select2-selection--single .select2-selection__rendered {
+            line-height: calc(2.25rem) !important;
+        }
+        .select2-container--bootstrap4 .select2-selection--single .select2-selection__arrow {
+            height: calc(2.25rem) !important;
+        }
+    </style>
 @stop

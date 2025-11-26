@@ -79,7 +79,7 @@ class TrabajoController extends Controller
 
     public function create()
     {
-        $servicios = Servicio::all();
+        $servicios = Servicio::orderBy('nombre')->get();
         $empleados = Empleado::with('cargo')->get();
         return view('trabajos.create', compact('servicios', 'empleados'));
     }
@@ -301,7 +301,7 @@ public function update(Request $request, Trabajo $trabajo)
 
     public function edit(Trabajo $trabajo)
     {
-        $servicios = Servicio::all();
+        $servicios = Servicio::orderBy('nombre')->get();
         $empleados = Empleado::with('cargo')->get();
         $trabajo->load(['trabajoServicios.servicio']);
         return view('trabajos.edit', compact('trabajo', 'servicios', 'empleados'));

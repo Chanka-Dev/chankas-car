@@ -115,7 +115,7 @@ return [
         'img' => [
             'path' => 'vendor/adminlte/dist/img/fj.png',
             'alt' => 'Chankas Car',
-            'effect' => 'animation__wobble',
+            'effect' => 'animation__pulse',
             'width' => 120,
             'height' => 70,
         ],
@@ -470,7 +470,7 @@ return [
             ],
         ],
         'Select2' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',

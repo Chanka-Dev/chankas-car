@@ -283,3 +283,17 @@ a:hover {
 .alert-danger {
   border-left: 4px solid #dc3545;
 }
+
+/* ========================================
+   PRELOADER (Pantalla de Carga)
+   ======================================== */
+.preloader img {
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+.preloader {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+}

@@ -16,7 +16,9 @@ class ServicioController extends Controller
 
     public function index()
     {
-        $servicios = Servicio::all();
+        $servicios = Servicio::withCount('trabajoServicios')
+            ->orderBy('nombre')
+            ->get();
         return view('servicios.index', compact('servicios'));
     }
 
@@ -90,13 +92,26 @@ class ServicioController extends Controller
 
     public function destroy(Servicio $servicio)
     {
+        // Verificar si tiene trabajos asociados
+        $cantidadTrabajos = \DB::table('trabajo_servicios')
+            ->where('id_servicio', $servicio->id_servicio)
+            ->count();
+        
+        if ($cantidadTrabajos > 0) {
+            return redirect()->route('servicios.index')
+                ->with('error', "No se puede eliminar el servicio '{$servicio->nombre}' porque tiene {$cantidadTrabajos} trabajo(s) asociado(s). Por seguridad, los servicios con historial no pueden eliminarse.");
+        }
+
         try {
+            // Eliminar relaciones con inventario (estas sí se pueden eliminar)
+            $servicio->servicioInventarios()->delete();
+            
             $servicio->delete();
             return redirect()->route('servicios.index')
                 ->with('success', 'Servicio eliminado exitosamente.');
         } catch (\Exception $e) {
             return redirect()->route('servicios.index')
-                ->with('error', 'No se puede eliminar el servicio porque tiene trabajos asociados.');
+                ->with('error', 'Error al eliminar el servicio: ' . $e->getMessage());
         }
     }
 

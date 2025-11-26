@@ -7,6 +7,47 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.1] - 2025-11-26
+
+### Added
+- 🔍 **Select2 globally enabled**
+  - Smart search in work order forms
+  - Improved interface for service selection
+  - Spanish translation of messages
+  - Auto-initialization on dynamic services
+
+- ⚡ **Smart phone number autocomplete**
+  - Real-time AJAX search when typing license plate (500ms debounce)
+  - Works in both create and edit work orders
+  - Visual indicators: new vs existing customer
+  - Reduces data entry errors
+
+### Improved
+- 🛡️ **Delete validation with referential integrity**
+  - **Customers**: Prevents deletion if has associated work orders
+  - **Employees**: Checks work orders and payments before deletion
+  - **Services**: Protects services with usage history
+  - **Inventory**: Blocks items used in work orders
+  - Descriptive messages with specific counters
+  - Visual "Protected" button when deletion is not allowed
+
+- 🎨 **Visual improvements**
+  - Improved preloader without circular border
+  - Logo animation changed from wobble to pulse
+  - Select2 with consistent height in Bootstrap 4
+
+- 📊 **Performance optimizations**
+  - Services alphabetically sorted in selects
+  - Work order count preloaded in services view
+  - `trabajoServicios` relationship added to Service model
+
+### Fixed
+- 🐛 Generic error messages replaced with specific ones
+- 🐛 Improved cascade deletion validation
+- 🐛 Select2 not initializing on dynamically added services
+
+---
+
 ## [1.0.0] - 2025-11-25
 
 ### Added

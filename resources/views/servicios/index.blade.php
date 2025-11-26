@@ -42,13 +42,20 @@
                                 <a href="{{ route('servicios.edit', $servicio->id_servicio) }}" class="btn btn-primary btn-sm">
                                     <i class="fas fa-edit"></i> Editar
                                 </a>
-                                <form id="delete-form-{{ $servicio->id_servicio }}" action="{{ route('servicios.destroy', $servicio->id_servicio) }}" method="POST" style="display:inline-block;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmarEliminacion('delete-form-{{ $servicio->id_servicio }}', 'el servicio {{ $servicio->nombre }}')">
-                                        <i class="fas fa-trash"></i> Eliminar
+                                
+                                @if($servicio->trabajo_servicios_count > 0)
+                                    <button type="button" class="btn btn-secondary btn-sm" disabled title="No se puede eliminar: tiene {{ $servicio->trabajo_servicios_count }} trabajo(s) asociado(s)">
+                                        <i class="fas fa-lock"></i> Protegido
                                     </button>
-                                </form>
+                                @else
+                                    <form id="delete-form-{{ $servicio->id_servicio }}" action="{{ route('servicios.destroy', $servicio->id_servicio) }}" method="POST" style="display:inline-block;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="confirmarEliminacion('delete-form-{{ $servicio->id_servicio }}', 'el servicio {{ $servicio->nombre }}')">
+                                            <i class="fas fa-trash"></i> Eliminar
+                                        </button>
+                                    </form>
+                                @endif
                             </td>
                         </tr>
                     @endforeach
@@ -69,5 +76,11 @@
                 }
             });
         });
+
+        function confirmarEliminacion(formId, nombre) {
+            if (confirm('¿Estás seguro de eliminar ' + nombre + '?')) {
+                document.getElementById(formId).submit();
+            }
+        }
     </script>
 @endpush

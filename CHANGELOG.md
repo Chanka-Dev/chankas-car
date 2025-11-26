@@ -7,6 +7,47 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## [1.0.1] - 2025-11-26
+
+### Agregado
+- 🔍 **Select2 activado globalmente**
+  - Búsqueda inteligente en formularios de trabajo
+  - Interfaz mejorada para seleccionar servicios
+  - Traducción al español de mensajes
+  - Auto-inicialización en servicios dinámicos
+
+- ⚡ **Autocompletado inteligente de teléfono**
+  - Búsqueda AJAX en tiempo real al escribir placa (500ms debounce)
+  - Funciona tanto en crear como editar trabajos
+  - Indicadores visuales: cliente nuevo vs existente
+  - Reduce errores de entrada de datos
+
+### Mejorado
+- 🛡️ **Validación de eliminación con integridad referencial**
+  - **Clientes**: No permite eliminar si tiene trabajos asociados
+  - **Empleados**: Verifica trabajos y pagos antes de eliminar
+  - **Servicios**: Protege servicios con historial de uso
+  - **Inventario**: Bloquea items usados en trabajos
+  - Mensajes descriptivos con contadores específicos
+  - Botón "Protegido" visual cuando no se puede eliminar
+
+- 🎨 **Mejoras visuales**
+  - Preloader mejorado sin borde circular
+  - Animación de logo cambiada de wobble a pulse
+  - Select2 con altura consistente en Bootstrap 4
+
+- 📊 **Optimizaciones de rendimiento**
+  - Servicios ordenados alfabéticamente en selects
+  - Contador de trabajos precargado en vista de servicios
+  - Relación `trabajoServicios` añadida al modelo Servicio
+
+### Corregido
+- 🐛 Mensajes de error genéricos reemplazados por específicos
+- 🐛 Validación mejorada de eliminación en cascada
+- 🐛 Select2 no se inicializaba en servicios agregados dinámicamente
+
+---
+
 ## [1.0.0] - 2025-11-25
 
 ### Agregado
