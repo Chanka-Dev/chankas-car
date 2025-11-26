@@ -63,7 +63,7 @@ return [
     |
     */
 
-    'logo' => '<b>Chankas</b>Car',
+    'logo' => '<b>Chanka\'s</b>Car',
     'logo_img' => 'vendor/adminlte/dist/img/fj.png',
     'logo_img_class' => 'brand-image img-square',
     'logo_img_xl' => null,
@@ -84,13 +84,13 @@ return [
     */
 
     'auth_logo' => [
-        'enabled' => false,
+        'enabled' => true,
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
-            'alt' => 'Auth Logo',
+            'path' => 'vendor/adminlte/dist/img/fj.png',
+            'alt' => 'Chankas Car',
             'class' => '',
-            'width' => 50,
-            'height' => 50,
+            'width' => 80,
+            'height' => 80,
         ],
     ],
 

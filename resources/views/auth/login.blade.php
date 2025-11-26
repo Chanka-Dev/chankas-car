@@ -85,20 +85,19 @@
         }
 
         .logo-container {
-            width: 80px;
-            height: 80px;
+            width: 120px;
+            height: 120px;
             margin: 0 auto 20px;
-            background: white;
-            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .logo-container i {
-            font-size: 40px;
-            color: #fbc02d;
+        .logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
         }
 
         .login-header h1 {
@@ -274,9 +273,9 @@
         <div class="login-card">
             <div class="login-header">
                 <div class="logo-container">
-                    <i class="fas fa-car"></i>
+                    <img src="{{ asset('vendor/adminlte/dist/img/fj.png') }}" alt="Chankas Car">
                 </div>
-                <h1>Chankas Car</h1>
+                <h1>Chanka's Car</h1>
                 <p>Sistema de Gestión de Taller GNV</p>
             </div>
 
