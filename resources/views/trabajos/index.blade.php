@@ -18,29 +18,97 @@
                 @endcanEdit
             </div>
         </div>
-        <div class="card-body">
+        
+        <!-- Filtros de búsqueda -->
+        <div class="card-body border-bottom">
+            <form method="GET" action="{{ route('trabajos.index') }}">
+                <div class="row">
+                    <!-- Búsqueda general -->
+                    <div class="col-md-4 mb-2">
+                        <div class="input-group input-group-sm">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            </div>
+                            <input type="text" name="buscar" class="form-control" 
+                                   placeholder="Buscar por placa, técnico, servicio, observación..." 
+                                   value="{{ request('buscar') }}">
+                        </div>
+                    </div>
+                    
+                    <!-- Filtro por técnico -->
+                    <div class="col-md-3 mb-2">
+                        <select name="id_empleado" class="form-control form-control-sm">
+                            <option value="">Todos los técnicos</option>
+                            @foreach($empleados as $empleado)
+                                <option value="{{ $empleado->id_empleado }}" 
+                                    {{ request('id_empleado') == $empleado->id_empleado ? 'selected' : '' }}>
+                                    {{ $empleado->nombre }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    
+                    <!-- Fecha desde -->
+                    <div class="col-md-2 mb-2">
+                        <input type="date" name="fecha_desde" class="form-control form-control-sm" 
+                               placeholder="Desde" value="{{ request('fecha_desde') }}">
+                    </div>
+                    
+                    <!-- Fecha hasta -->
+                    <div class="col-md-2 mb-2">
+                        <input type="date" name="fecha_hasta" class="form-control form-control-sm" 
+                               placeholder="Hasta" value="{{ request('fecha_hasta') }}">
+                    </div>
+                    
+                    <!-- Botones -->
+                    <div class="col-md-1 mb-2">
+                        <button type="submit" class="btn btn-primary btn-sm btn-block">
+                            <i class="fas fa-filter"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Segunda fila con info y botón limpiar -->
+                <div class="row">
+                    <div class="col-md-6">
+                        @if(request()->hasAny(['buscar', 'id_empleado', 'fecha_desde', 'fecha_hasta']))
+                            <a href="{{ route('trabajos.index') }}" class="btn btn-sm btn-secondary">
+                                <i class="fas fa-times"></i> Limpiar filtros
+                            </a>
+                            <span class="ml-2 text-muted small">
+                                <i class="fas fa-filter"></i> Filtros activos
+                            </span>
+                        @endif
+                    </div>
+                    <div class="col-md-6 text-right">
+                        <span class="badge badge-info">Total: {{ $trabajos->total() }} trabajos</span>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table id="trabajos-table" class="table table-bordered table-striped table-sm">
+                <table class="table table-bordered table-striped table-sm table-hover mb-0">
                     <thead>
                         <tr>
-                            <th>N°</th>
-                            <th>Fecha</th>
-                            <th>Fecha Rec.</th>
+                            <th style="width: 50px;">N°</th>
+                            <th style="width: 100px;">Fecha</th>
+                            <th style="width: 100px;">Fecha Rec.</th>
                             <th>Técnico</th>
-                            <th>Placa</th>
+                            <th style="width: 100px;">Placa</th>
                             <th>Trabajos Realizados</th>
-                            <th>Total Cliente (Bs)</th>
-                            <th>Total Téc. (Bs)</th>
+                            <th style="width: 100px;" class="text-right">Total Cliente</th>
+                            <th style="width: 100px;" class="text-right">Total Téc.</th>
                             <th>Observaciones</th>
-                            <th>Celular</th>
-                            <th>Acciones</th>
-                            <th>Visitas</th>
+                            <th style="width: 100px;">Celular</th>
+                            <th style="width: 150px;" class="text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($trabajos as $index => $trabajo)
+                        @foreach($trabajos as $trabajo)
                             <tr>
-                                <td>{{ count($trabajos) - $index }}</td>
+                                <td>{{ $trabajo->id_trabajo }}</td>
                                 <td>{{ $trabajo->fecha_trabajo->format('d/m/Y') }}</td>
                                 <td>
                                     {{ $trabajo->fecha_recepcion->format('d/m/Y') }}
@@ -48,7 +116,7 @@
                                         <br><small class="text-muted">Recal: {{ $trabajo->fecha_recalificacion->format('d/m/Y') }}</small>
                                     @endif
                                 </td>
-                                <td>{{ $trabajo->empleado->nombre }} {{ $trabajo->empleado->apellido }}</td>
+                                <td>{{ $trabajo->empleado->nombre }}</td>
                                 <td><strong>{{ $trabajo->cliente ? $trabajo->cliente->placas : 'SIN PLACA' }}</strong></td>
                                 <td>
                                     @if($trabajo->trabajoServicios->count() > 0)
@@ -82,40 +150,24 @@
                                     @endif
                                 </td>
                                 <td>{{ $trabajo->cliente && $trabajo->cliente->telefono ? $trabajo->cliente->telefono : 'N/A' }}</td>
-                                <td>
-                                    <a href="{{ route('trabajos.detalle-venta', $trabajo->id_trabajo) }}" class="btn btn-warning btn-xs" title="Generar PDF" target="_blank">
-                                        <i class="fas fa-file-pdf"></i>
-                                    </a>
-                                    @canEdit
-                                        <a href="{{ route('trabajos.edit', $trabajo->id_trabajo) }}" class="btn btn-primary btn-xs" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <form id="delete-form-{{ $trabajo->id_trabajo }}" action="{{ route('trabajos.destroy', $trabajo->id_trabajo) }}" method="POST" style="display:inline-block;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button" class="btn btn-danger btn-xs" onclick="confirmarEliminacion('delete-form-{{ $trabajo->id_trabajo }}', 'el trabajo #{{ $trabajo->id_trabajo }}')" title="Eliminar">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    @endcanEdit
-                                </td>
                                 <td class="text-center">
-                                    @if($trabajo->id_cliente && isset($trabajosPorPlaca[$trabajo->id_cliente]))
-                                        @php
-                                            $visitas = $trabajosPorPlaca[$trabajo->id_cliente];
-                                        @endphp
-                                        @if($visitas > 1)
-                                            <span class="badge badge-warning" title="{{ $visitas }} trabajos realizados">
-                                                <i class="fas fa-redo"></i> {{ $visitas }}
-                                            </span>
-                                        @else
-                                            <span class="badge badge-secondary">
-                                                <i class="fas fa-check"></i> {{ $visitas }}
-                                            </span>
-                                        @endif
-                                    @else
-                                        <span class="text-muted">-</span>
-                                    @endif
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ route('trabajos.detalle-venta', $trabajo->id_trabajo) }}" class="btn btn-warning btn-sm" title="Generar PDF" target="_blank">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </a>
+                                        @canEdit
+                                            <a href="{{ route('trabajos.edit', $trabajo->id_trabajo) }}" class="btn btn-primary btn-sm" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form id="delete-form-{{ $trabajo->id_trabajo }}" action="{{ route('trabajos.destroy', $trabajo->id_trabajo) }}" method="POST" style="display:inline-block;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="btn btn-danger btn-sm" onclick="confirmarEliminacion('delete-form-{{ $trabajo->id_trabajo }}', 'el trabajo #{{ $trabajo->id_trabajo }}')" title="Eliminar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        @endcanEdit
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach
@@ -123,24 +175,27 @@
                 </table>
             </div>
         </div>
+        
+        <!-- Paginación -->
+        <div class="card-footer clearfix">
+            <div class="float-left">
+                <small class="text-muted">
+                    Mostrando {{ $trabajos->firstItem() ?? 0 }} - {{ $trabajos->lastItem() ?? 0 }} de {{ $trabajos->total() }} trabajos
+                </small>
+            </div>
+            <div class="float-right">
+                {{ $trabajos->onEachSide(1)->links('pagination::bootstrap-4') }}
+            </div>
+        </div>
     </div>
 @stop
 
-@push('scripts')
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+@push('js')
     <script>
-        $(document).ready(function() {
-            $('#trabajos-table').DataTable({
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json"
-                },
-                "order": [[1, "desc"]],
-                "columnDefs": [
-                    { "orderable": false, "targets": 0 }
-                ],
-                "pageLength": 25
-            });
-        });
+        function confirmarEliminacion(formId, nombre) {
+            if (confirm('¿Estás seguro de eliminar ' + nombre + '?')) {
+                document.getElementById(formId).submit();
+            }
+        }
     </script>
 @endpush

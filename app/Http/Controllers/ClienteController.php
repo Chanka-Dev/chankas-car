@@ -15,9 +15,25 @@ class ClienteController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $clientes = Cliente::withCount('trabajos')->get();
+        $query = Cliente::withCount('trabajos');
+        
+        // Búsqueda por placa o teléfono
+        if ($request->filled('buscar')) {
+            $buscar = $request->buscar;
+            $query->where(function($q) use ($buscar) {
+                $q->where('placas', 'like', '%' . $buscar . '%')
+                  ->orWhere('telefono', 'like', '%' . $buscar . '%');
+            });
+        }
+        
+        // Ordenar por más recientes primero
+        $query->orderBy('created_at', 'desc');
+        
+        // Paginar
+        $clientes = $query->paginate(50)->withQueryString();
+        
         return view('clientes.index', compact('clientes'));
     }
 

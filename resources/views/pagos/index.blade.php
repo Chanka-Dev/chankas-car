@@ -125,7 +125,7 @@
                         </tbody>
                         <tfoot>
                             <tr class="bg-light">
-                                <td colspan="5" class="text-right"><strong>Total mostrado:</strong></td>
+                                <td colspan="5" class="text-right"><strong>Total en página:</strong></td>
                                 <td class="text-right">
                                     <strong>Bs {{ number_format($historialPagos->sum('monto_pagado'), 2) }}</strong>
                                 </td>
@@ -133,6 +133,11 @@
                             </tr>
                         </tfoot>
                     </table>
+                    
+                    <!-- Paginación -->
+                    <div class="mt-3">
+                        {{ $historialPagos->links('pagination::bootstrap-4') }}
+                    </div>
                 </div>
             @else
                 <div class="alert alert-info">

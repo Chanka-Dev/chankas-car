@@ -5,6 +5,32 @@
     <link rel="shortcut icon" type="image/png" href="{{ asset('favicon.png') }}?v={{ config('app.version', '1.0') }}">
     <link rel="apple-touch-icon" sizes="192x192" href="{{ asset('favicon.png') }}">
     @vite('resources/css/adminlte-theme.css')
+    <style>
+        /* Fix para paginación de Laravel con AdminLTE */
+        .pagination {
+            margin: 0;
+        }
+        .pagination .page-link {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        
+        /* Fix para preloader - quitar círculo/óvalo alrededor del logo */
+        .preloader img {
+            border-radius: 0 !important;
+            background: transparent !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+        }
+        .preloader {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+        }
+    </style>
 @stop
 
 @section('js')

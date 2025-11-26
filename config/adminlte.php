@@ -113,11 +113,11 @@ return [
         'enabled' => true,
         'mode' => 'fullscreen',
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
-            'alt' => 'AdminLTE Preloader Image',
-            'effect' => 'animation__shake',
-            'width' => 60,
-            'height' => 60,
+            'path' => 'vendor/adminlte/dist/img/fj.png',
+            'alt' => 'Chankas Car',
+            'effect' => 'animation__wobble',
+            'width' => 120,
+            'height' => 70,
         ],
     ],
 

@@ -69,11 +69,10 @@ class PagoController extends Controller
         // Obtener todos los saldos pendientes (para todos los empleados)
         $saldosPendientes = $this->calcularSaldosPendientes();
 
-        // Obtener historial de pagos (últimos 50 pagos por defecto)
+        // Obtener historial de pagos con paginación
         $historialPagos = PagoTecnico::with('empleado')
             ->orderBy('fecha_pago', 'desc')
-            ->limit(50)
-            ->get();
+            ->paginate(20);
 
         // Estadísticas de historial
         $totalPagosRealizados = PagoTecnico::sum('monto_pagado');
@@ -179,12 +178,11 @@ class PagoController extends Controller
      */
     private function calcularSaldoEmpleado($idEmpleado)
     {
-        // Total de comisiones generadas
-        $totalComisiones = Trabajo::where('id_empleado', $idEmpleado)
-            ->get()
-            ->sum(function($trabajo) {
-                return $trabajo->total_tecnico;
-            });
+        // Total de comisiones generadas (optimizado con join)
+        $totalComisiones = DB::table('trabajo_servicios')
+            ->join('trabajos', 'trabajo_servicios.id_trabajo', '=', 'trabajos.id_trabajo')
+            ->where('trabajos.id_empleado', $idEmpleado)
+            ->sum('trabajo_servicios.importe_tecnico');
 
         // Total pagado
         $totalPagado = PagoTecnico::where('id_empleado', $idEmpleado)

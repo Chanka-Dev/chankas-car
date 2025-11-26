@@ -21,19 +21,60 @@ class TrabajoController extends Controller
         $this->middleware('role:admin,cajero,tecnico')->only(['create', 'store', 'edit', 'update', 'destroy']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $trabajos = Trabajo::with(['empleado', 'cliente', 'trabajoServicios.servicio'])
-            ->orderBy('fecha_trabajo', 'desc')
-            ->get();
+        $query = Trabajo::with(['empleado', 'cliente', 'trabajoServicios.servicio'])
+            ->orderBy('fecha_trabajo', 'desc');
         
-        // Contar trabajos por placa
-        $trabajosPorPlaca = Trabajo::whereNotNull('id_cliente')
-            ->select('id_cliente', DB::raw('count(*) as total'))
-            ->groupBy('id_cliente')
-            ->pluck('total', 'id_cliente');
+        // Búsqueda general (busca en placa, técnico, servicio, observaciones)
+        if ($request->filled('buscar')) {
+            $buscar = $request->buscar;
+            
+            $query->where(function($q) use ($buscar) {
+                // Buscar en placa del cliente
+                $q->whereHas('cliente', function($subQ) use ($buscar) {
+                    $subQ->where('placas', 'like', '%' . $buscar . '%')
+                         ->orWhere('telefono', 'like', '%' . $buscar . '%');
+                })
+                // Buscar en nombre del técnico
+                ->orWhereHas('empleado', function($subQ) use ($buscar) {
+                    $subQ->where('nombre', 'like', '%' . $buscar . '%')
+                         ->orWhere('apellido', 'like', '%' . $buscar . '%');
+                })
+                // Buscar en servicios realizados
+                ->orWhereHas('trabajoServicios.servicio', function($subQ) use ($buscar) {
+                    $subQ->where('nombre', 'like', '%' . $buscar . '%');
+                })
+                // Buscar en observaciones del trabajo
+                ->orWhere('observaciones', 'like', '%' . $buscar . '%')
+                // Buscar en observaciones de los servicios
+                ->orWhereHas('trabajoServicios', function($subQ) use ($buscar) {
+                    $subQ->where('observaciones', 'like', '%' . $buscar . '%');
+                });
+            });
+        }
         
-        return view('trabajos.index', compact('trabajos', 'trabajosPorPlaca'));
+        // Filtro por técnico específico
+        if ($request->filled('id_empleado')) {
+            $query->where('id_empleado', $request->id_empleado);
+        }
+        
+        // Filtro por rango de fechas
+        if ($request->filled('fecha_desde')) {
+            $query->where('fecha_trabajo', '>=', $request->fecha_desde);
+        }
+        
+        if ($request->filled('fecha_hasta')) {
+            $query->where('fecha_trabajo', '<=', $request->fecha_hasta);
+        }
+        
+        // Paginar en lugar de get()
+        $trabajos = $query->paginate(50)->withQueryString();
+        
+        // Obtener empleados para el filtro
+        $empleados = \App\Models\Empleado::orderBy('nombre')->get();
+        
+        return view('trabajos.index', compact('trabajos', 'empleados'));
     }
 
     public function create()
@@ -317,7 +358,7 @@ public function update(Request $request, Trabajo $trabajo)
         $trabajos = Trabajo::with(['empleado', 'cliente', 'trabajoServicios.servicio'])
             ->where('id_empleado', $user->id_empleado)
             ->orderBy('fecha_trabajo', 'desc')
-            ->get();
+            ->paginate(30);
         
         return view('trabajos.mis-trabajos', compact('trabajos'));
     }

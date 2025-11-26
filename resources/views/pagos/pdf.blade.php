@@ -2,163 +2,177 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle de Pago</title>
+    <title>Pago Semanal</title>
     <style>
+        @page {
+            margin: 10mm 8mm;
+            size: letter;
+        }
         body {
             font-family: Arial, sans-serif;
-            font-size: 12px;
-            margin: 20px;
+            font-size: 8px;
+            margin: 0;
+            padding: 0;
         }
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #333;
-            padding-bottom: 10px;
+            margin-bottom: 8px;
+            border-bottom: 1.5px solid #000;
+            padding-bottom: 4px;
         }
         .header h1 {
             margin: 0;
-            font-size: 24px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .header p {
+            margin: 2px 0;
+            font-size: 8px;
         }
         .info-empleado {
-            margin-bottom: 20px;
-            background-color: #f5f5f5;
-            padding: 10px;
-            border-radius: 5px;
+            margin-bottom: 6px;
+            background-color: #f0f0f0;
+            padding: 4px 6px;
+            display: flex;
+            justify-content: space-between;
         }
-        .info-empleado p {
-            margin: 5px 0;
-        }
-        .fecha-grupo {
-            margin-top: 20px;
-            page-break-inside: avoid;
-        }
-        .fecha-header {
-            background-color: #333;
-            color: white;
-            padding: 8px;
-            font-weight: bold;
-            margin-bottom: 5px;
+        .info-empleado div {
+            margin: 0;
+            line-height: 1.3;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 15px;
+            margin-bottom: 4px;
         }
         table th {
-            background-color: #666;
+            background-color: #333;
             color: white;
-            padding: 8px;
+            padding: 3px 4px;
             text-align: left;
-            font-size: 11px;
+            font-size: 7px;
+            font-weight: bold;
+            border: 1px solid #000;
         }
         table td {
-            padding: 6px 8px;
-            border-bottom: 1px solid #ddd;
+            padding: 2px 4px;
+            border: 1px solid #ddd;
+            font-size: 7px;
+            vertical-align: top;
+        }
+        .fecha-header {
+            background-color: #555;
+            color: white;
+            padding: 2px 4px;
+            font-weight: bold;
+            font-size: 7px;
+            border: 1px solid #000;
         }
         .subtotal-row {
-            background-color: #f0f0f0;
+            background-color: #e8e8e8;
             font-weight: bold;
+            font-size: 7px;
         }
         .total-final {
-            margin-top: 30px;
-            background-color: #28a745;
+            margin-top: 6px;
+            background-color: #000;
             color: white;
-            padding: 15px;
+            padding: 6px;
             text-align: right;
-            font-size: 18px;
+            font-size: 11px;
             font-weight: bold;
         }
         .text-right {
             text-align: right;
         }
-        .footer {
-            margin-top: 50px;
+        .text-center {
             text-align: center;
-            font-size: 10px;
-            color: #666;
-            border-top: 1px solid #ddd;
-            padding-top: 10px;
         }
-        .servicios-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        .servicios-compact {
+            font-size: 6.5px;
+            line-height: 1.2;
         }
-        .servicios-list li {
-            font-size: 10px;
-            margin: 2px 0;
+        .small {
+            font-size: 6px;
         }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>CHANKAS CAR</h1>
-        <p>Detalle de Pago - Técnico</p>
+        <p>DETALLE DE PAGO SEMANAL</p>
     </div>
 
     <div class="info-empleado">
-        <p><strong>Técnico:</strong> {{ $empleado->nombre }} {{ $empleado->apellido }}</p>
-        <p><strong>Cargo:</strong> {{ $empleado->cargo->nombre }}</p>
-        <p><strong>CI:</strong> {{ $empleado->ci }}</p>
-        <p><strong>Período:</strong> {{ \Carbon\Carbon::parse($fechaInicio)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($fechaFin)->format('d/m/Y') }}</p>
-        <p><strong>Fecha de Emisión:</strong> {{ \Carbon\Carbon::now()->format('d/m/Y H:i') }}</p>
+        <div>
+            <strong>Técnico:</strong> {{ $empleado->nombre }} {{ $empleado->apellido }} | 
+            <strong>CI:</strong> {{ $empleado->ci }}
+        </div>
+        <div>
+            <strong>Período:</strong> {{ \Carbon\Carbon::parse($fechaInicio)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($fechaFin)->format('d/m/Y') }} | 
+            <strong>Emisión:</strong> {{ \Carbon\Carbon::now()->format('d/m/Y') }}
+        </div>
     </div>
 
-    @foreach($trabajosPorFecha as $fecha => $trabajosDia)
-        <div class="fecha-grupo">
-            <div class="fecha-header">
-                {{ \Carbon\Carbon::parse($fecha)->format('d/m/Y') }} - 
-                {{ $trabajosDia->count() }} trabajo(s) - 
-                Bs {{ number_format($trabajosDia->sum('total_tecnico'), 2) }}
-            </div>
-
-            <table>
-                <thead>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 10%;">Fecha</th>
+                <th style="width: 12%;">Placa</th>
+                <th style="width: 58%;">Servicios Realizados</th>
+                <th style="width: 10%;" class="text-right">Com. (Bs)</th>
+                <th style="width: 10%;" class="text-right">Total (Bs)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+                $totalDia = 0;
+                $fechaActual = null;
+                $trabajosDelDia = 0;
+            @endphp
+            
+            @foreach($trabajosPorFecha as $fecha => $trabajosDia)
+                @foreach($trabajosDia as $index => $trabajo)
+                    @php
+                        $esPrimeraFilaDelDia = ($index === 0);
+                        $esUltimaFilaDelDia = ($index === count($trabajosDia) - 1);
+                    @endphp
+                    
                     <tr>
-                        <th>Placa</th>
-                        <th>Fecha</th>
-                        <th>Servicios Realizados</th>
-                        <th style="text-align: right;">Comisión</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($trabajosDia as $trabajo)
-                        <tr>
-                            <td><strong>{{ $trabajo->cliente ? $trabajo->cliente->placas : 'SIN PLACA' }}</strong></td>
-                            <td>{{ \Carbon\Carbon::parse($trabajo->fecha_trabajo)->format('d/m/Y') }}</td>
-                            <td>
-                                <ul class="servicios-list">
-                                    @foreach($trabajo->trabajoServicios as $ts)
-                                        <li>
-                                            • {{ $ts->servicio->nombre }}
-                                            @if($ts->cantidad > 1)
-                                                (x{{ $ts->cantidad }})
-                                            @endif
-                                            - Bs {{ number_format($ts->importe_tecnico, 2) }}
-                                        </li>
-                                    @endforeach
-                                </ul>
+                        @if($esPrimeraFilaDelDia)
+                            <td rowspan="{{ count($trabajosDia) }}" class="text-center" style="background-color: #f9f9f9; font-weight: bold;">
+                                {{ \Carbon\Carbon::parse($fecha)->format('d/m/Y') }}
                             </td>
-                            <td class="text-right">Bs {{ number_format($trabajo->total_tecnico, 2) }}</td>
-                        </tr>
-                    @endforeach
-                    <tr class="subtotal-row">
-                        <td colspan="2" class="text-right">Subtotal del día:</td>
-                        <td class="text-right">Bs {{ number_format($trabajosDia->sum('total_tecnico'), 2) }}</td>
+                        @endif
+                        
+                        <td><strong>{{ $trabajo->cliente ? $trabajo->cliente->placas : 'S/P' }}</strong></td>
+                        <td class="servicios-compact">
+                            @foreach($trabajo->trabajoServicios as $ts)
+                                • {{ $ts->servicio->nombre }}
+                                @if($ts->cantidad > 1) <span class="small">(x{{ $ts->cantidad }})</span> @endif
+                                <span class="small">Bs {{ number_format($ts->importe_tecnico, 2) }}</span>
+                                @if(!$loop->last) | @endif
+                            @endforeach
+                        </td>
+                        <td class="text-right">{{ number_format($trabajo->total_tecnico, 2) }}</td>
+                        
+                        @if($esPrimeraFilaDelDia)
+                            <td rowspan="{{ count($trabajosDia) }}" class="text-right" style="background-color: #f0f0f0; font-weight: bold; font-size: 8px;">
+                                {{ number_format($trabajosDia->sum('total_tecnico'), 2) }}
+                            </td>
+                        @endif
                     </tr>
-                </tbody>
-            </table>
-        </div>
-    @endforeach
+                @endforeach
+            @endforeach
+        </tbody>
+    </table>
 
     <div class="total-final">
         TOTAL A PAGAR: Bs {{ number_format($totalComision, 2) }}
     </div>
 
-    <div class="footer">
-        <p>Documento generado el {{ \Carbon\Carbon::now()->format('d/m/Y H:i') }}</p>
-        <p>Chankas Car - Sistema de Gestión</p>
+    <div style="margin-top: 8px; text-align: center; font-size: 6px; color: #666;">
+        Documento generado el {{ \Carbon\Carbon::now()->format('d/m/Y H:i') }} - Chankas Car
     </div>
 </body>
 </html>
