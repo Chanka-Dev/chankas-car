@@ -22,6 +22,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - Visual indicators: new vs existing customer
   - Reduces data entry errors
 
+- 🛡️ **Brute force attack protection (Rate Limiting)**
+  - **Login**: Maximum 5 attempts per minute
+  - **Registration**: Maximum 3 registrations every 10 minutes
+  - **Password recovery**: Maximum 3 attempts every 10 minutes
+  - **Authenticated routes**: 120 requests per minute
+  - **AJAX searches**: 30 requests per minute
+  - Custom 429 error page with countdown timer
+  - Automatic temporary blocking of suspicious IPs
+
 ### Improved
 - 🛡️ **Delete validation with referential integrity**
   - **Customers**: Prevents deletion if has associated work orders

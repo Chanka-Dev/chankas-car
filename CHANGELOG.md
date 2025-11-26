@@ -22,6 +22,15 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
   - Indicadores visuales: cliente nuevo vs existente
   - Reduce errores de entrada de datos
 
+- 🛡️ **Protección contra ataques de fuerza bruta (Rate Limiting)**
+  - **Login**: Máximo 5 intentos por minuto
+  - **Registro**: Máximo 3 registros cada 10 minutos
+  - **Recuperación de contraseña**: Máximo 3 intentos cada 10 minutos
+  - **Rutas autenticadas**: 120 peticiones por minuto
+  - **Búsquedas AJAX**: 30 peticiones por minuto
+  - Página de error 429 personalizada con temporizador
+  - Bloqueo temporal automático de IP sospechosas
+
 ### Mejorado
 - 🛡️ **Validación de eliminación con integridad referencial**
   - **Clientes**: No permite eliminar si tiene trabajos asociados

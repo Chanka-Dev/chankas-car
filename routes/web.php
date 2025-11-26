@@ -19,15 +19,19 @@ use App\Http\Controllers\ActivityLogController;
 require __DIR__.'/auth.php';
 
 // Rutas protegidas - requieren autenticación
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'throttle:120,1'])->group(function () { // 120 peticiones por minuto para usuarios autenticados
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     // Rutas de solo lectura para todos los roles
     Route::get('/trabajos/{trabajo}/detalle-venta', [TrabajoController::class, 'detalleVenta'])->name('trabajos.detalle-venta');
 
-    // Rutas AJAX (accesibles para todos los usuarios autenticados)
-    Route::post('/trabajos/buscar-cliente', [TrabajoController::class, 'buscarCliente'])->name('trabajos.buscar-cliente');
-    Route::get('/servicios/{servicio}/piezas', [ServicioController::class, 'getPiezas'])->name('servicios.piezas');
+    // Rutas AJAX (accesibles para todos los usuarios autenticados) - Rate limit más estricto
+    Route::post('/trabajos/buscar-cliente', [TrabajoController::class, 'buscarCliente'])
+        ->middleware('throttle:30,1') // 30 búsquedas por minuto
+        ->name('trabajos.buscar-cliente');
+    Route::get('/servicios/{servicio}/piezas', [ServicioController::class, 'getPiezas'])
+        ->middleware('throttle:30,1')
+        ->name('servicios.piezas');
 
     // Rutas de perfil y cambio de contraseña (todos los usuarios autenticados)
     Route::get('/profile/password', [ProfileController::class, 'editPassword'])->name('profile.password.edit');
