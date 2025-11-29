@@ -214,7 +214,7 @@
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json"
                 },
-                "order": [[1, "desc"]] // Ordenar por fecha descendente
+                "order": [[0, "desc"]] // Ordenar por fecha descendente (columna 0)
             });
         });
     </script>
