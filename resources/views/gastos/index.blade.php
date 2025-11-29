@@ -76,7 +76,9 @@
                     <tbody>
                         @foreach($gastos as $gasto)
                             <tr>
-                                <td>{{ is_string($gasto['fecha']) ? \Carbon\Carbon::parse($gasto['fecha'])->format('d/m/Y') : $gasto['fecha']->format('d/m/Y') }}</td>
+                                <td data-order="{{ is_string($gasto['fecha']) ? \Carbon\Carbon::parse($gasto['fecha'])->timestamp : $gasto['fecha']->timestamp }}">
+                                    {{ is_string($gasto['fecha']) ? \Carbon\Carbon::parse($gasto['fecha'])->format('d/m/Y') : $gasto['fecha']->format('d/m/Y') }}
+                                </td>
                                 <td>
                                     @if($gasto['tipo'] === 'pago_tecnico')
                                         <span class="badge badge-info">Pago Técnico</span>
