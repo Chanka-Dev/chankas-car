@@ -39,114 +39,6 @@
         </div>
     @endif
 
-    <!-- Historial de Pagos Realizados -->
-    <div class="card card-primary collapsed-card">
-        <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-history"></i> Historial de Pagos Realizados</h3>
-            <div class="card-tools">
-                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </div>
-        </div>
-        <div class="card-body" style="display: none;">
-            <!-- Estadísticas rápidas -->
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <div class="info-box bg-success">
-                        <span class="info-box-icon"><i class="fas fa-money-bill-wave"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">Total Pagos Realizados (Histórico)</span>
-                            <span class="info-box-number">Bs {{ number_format($totalPagosRealizados, 2) }}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="info-box bg-info">
-                        <span class="info-box-icon"><i class="fas fa-calendar-check"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">Pagos del Mes Actual</span>
-                            <span class="info-box-number">Bs {{ number_format($pagosMesActual, 2) }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            @if($historialPagos->count() > 0)
-                <div class="table-responsive">
-                    <table id="tabla-historial" class="table table-bordered table-striped table-sm">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Fecha Pago</th>
-                                <th>Técnico</th>
-                                <th>Período</th>
-                                <th>Tipo</th>
-                                <th class="text-right">Monto Pagado</th>
-                                <th>Observaciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($historialPagos as $pago)
-                                <tr>
-                                    <td>{{ $pago->id_pago }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($pago->fecha_pago)->format('d/m/Y') }}</td>
-                                    <td>
-                                        <strong>{{ $pago->empleado->nombre }} {{ $pago->empleado->apellido }}</strong>
-                                        <br><small class="text-muted">{{ $pago->empleado->cargo->nombre }}</small>
-                                    </td>
-                                    <td>
-                                        <small>
-                                            {{ \Carbon\Carbon::parse($pago->periodo_inicio)->format('d/m/Y') }} - 
-                                            {{ \Carbon\Carbon::parse($pago->periodo_fin)->format('d/m/Y') }}
-                                        </small>
-                                    </td>
-                                    <td>
-                                        @if($pago->tipo_pago == 'completo')
-                                            <span class="badge badge-success">Completo</span>
-                                        @elseif($pago->tipo_pago == 'parcial')
-                                            <span class="badge badge-warning">Parcial</span>
-                                        @else
-                                            <span class="badge badge-info">Saldo</span>
-                                        @endif
-                                    </td>
-                                    <td class="text-right">
-                                        <strong class="text-success">Bs {{ number_format($pago->monto_pagado, 2) }}</strong>
-                                    </td>
-                                    <td>
-                                        @if($pago->observaciones)
-                                            <small>{{ Str::limit($pago->observaciones, 40) }}</small>
-                                        @else
-                                            <span class="text-muted">-</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                        <tfoot>
-                            <tr class="bg-light">
-                                <td colspan="5" class="text-right"><strong>Total en página:</strong></td>
-                                <td class="text-right">
-                                    <strong>Bs {{ number_format($historialPagos->sum('monto_pagado'), 2) }}</strong>
-                                </td>
-                                <td></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                    
-                    <!-- Paginación -->
-                    <div class="mt-3">
-                        {{ $historialPagos->links('pagination::bootstrap-4') }}
-                    </div>
-                </div>
-            @else
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> No hay pagos registrados aún.
-                </div>
-            @endif
-        </div>
-    </div>
-
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">Filtrar Pagos por Técnico y Fechas</h3>
@@ -461,6 +353,109 @@
             </div>
         </div>
     </div>
+
+    <!-- Historial de Pagos Realizados -->
+    <div class="card card-primary">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-history"></i> Historial de Pagos Realizados</h3>
+        </div>
+        <div class="card-body">
+            <!-- Estadísticas rápidas -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="info-box bg-success">
+                        <span class="info-box-icon"><i class="fas fa-money-bill-wave"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Total Pagos Realizados (Histórico)</span>
+                            <span class="info-box-number">Bs {{ number_format($totalPagosRealizados, 2) }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-box bg-info">
+                        <span class="info-box-icon"><i class="fas fa-calendar-check"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Pagos del Mes Actual</span>
+                            <span class="info-box-number">Bs {{ number_format($pagosMesActual, 2) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if($historialPagos->count() > 0)
+                <div class="table-responsive">
+                    <table id="tabla-historial" class="table table-bordered table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Fecha Pago</th>
+                                <th>Técnico</th>
+                                <th>Período</th>
+                                <th>Tipo</th>
+                                <th class="text-right">Monto Pagado</th>
+                                <th>Observaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($historialPagos as $pago)
+                                <tr>
+                                    <td>{{ $pago->id_pago }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($pago->fecha_pago)->format('d/m/Y') }}</td>
+                                    <td>
+                                        <strong>{{ $pago->empleado->nombre }} {{ $pago->empleado->apellido }}</strong>
+                                        <br><small class="text-muted">{{ $pago->empleado->cargo->nombre }}</small>
+                                    </td>
+                                    <td>
+                                        <small>
+                                            {{ \Carbon\Carbon::parse($pago->periodo_inicio)->format('d/m/Y') }} - 
+                                            {{ \Carbon\Carbon::parse($pago->periodo_fin)->format('d/m/Y') }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        @if($pago->tipo_pago == 'completo')
+                                            <span class="badge badge-success">Completo</span>
+                                        @elseif($pago->tipo_pago == 'parcial')
+                                            <span class="badge badge-warning">Parcial</span>
+                                        @else
+                                            <span class="badge badge-info">Saldo</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-right">
+                                        <strong class="text-success">Bs {{ number_format($pago->monto_pagado, 2) }}</strong>
+                                    </td>
+                                    <td>
+                                        @if($pago->observaciones)
+                                            <small>{{ Str::limit($pago->observaciones, 40) }}</small>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                        <tfoot>
+                            <tr class="bg-light">
+                                <td colspan="5" class="text-right"><strong>Total en página:</strong></td>
+                                <td class="text-right">
+                                    <strong>Bs {{ number_format($historialPagos->sum('monto_pagado'), 2) }}</strong>
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    
+                    <!-- Paginación -->
+                    <div class="mt-3">
+                        {{ $historialPagos->links('pagination::bootstrap-4') }}
+                    </div>
+                </div>
+            @else
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No hay pagos registrados aún.
+                </div>
+            @endif
+        </div>
+    </div>
 @stop
 
 @section('css')
@@ -473,23 +468,14 @@
 <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
 <script>
     $(document).ready(function() {
-        var tablaInicializada = false;
-
-        // Inicializar DataTable cuando se expanda la card
-        $('[data-card-widget="collapse"]').on('click', function() {
-            if (!tablaInicializada) {
-                setTimeout(function() {
-                    $('#tabla-historial').DataTable({
-                        "language": {
-                            "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json"
-                        },
-                        "order": [[0, "desc"]],
-                        "pageLength": 25,
-                        "responsive": true
-                    });
-                    tablaInicializada = true;
-                }, 300);
-            }
+        // Inicializar DataTable directamente
+        $('#tabla-historial').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json"
+            },
+            "order": [[0, "desc"]],
+            "pageLength": 25,
+            "responsive": true
         });
     });
 

@@ -39,8 +39,9 @@
 
             <!-- Resumen de gastos del mes -->
             @php
-                $gastosMesActual = $gastos->filter(function($gasto) {
-                    return $gasto->fecha->month == date('m') && $gasto->fecha->year == date('Y');
+                $gastosMesActual = collect($gastos)->filter(function($gasto) {
+                    $fecha = is_string($gasto['fecha']) ? \Carbon\Carbon::parse($gasto['fecha']) : $gasto['fecha'];
+                    return $fecha->month == date('m') && $fecha->year == date('Y');
                 });
                 $totalMes = $gastosMesActual->sum('monto');
             @endphp
@@ -62,39 +63,53 @@
                 <table id="gastos-table" class="table table-bordered table-striped table-sm">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Fecha</th>
+                            <th>Tipo</th>
                             <th>Concepto</th>
                             <th>Descripción</th>
                             <th>Monto (Bs)</th>
                             <th>Comprobante</th>
-                            <th>Registrado por</th>
+                            <th>Empleado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($gastos as $gasto)
                             <tr>
-                                <td>{{ $gasto->id_gasto }}</td>
-                                <td>{{ $gasto->fecha->format('d/m/Y') }}</td>
-                                <td><strong>{{ $gasto->concepto }}</strong></td>
-                                <td>{{ $gasto->descripcion ? Str::limit($gasto->descripcion, 40) : '-' }}</td>
-                                <td class="text-right">
-                                    <span class="badge badge-danger">Bs {{ number_format($gasto->monto, 2) }}</span>
-                                </td>
-                                <td>{{ $gasto->comprobante ?? 'N/A' }}</td>
-                                <td>{{ $gasto->empleado ? $gasto->empleado->nombre . ' ' . $gasto->empleado->apellido : 'Sistema' }}</td>
+                                <td>{{ is_string($gasto['fecha']) ? \Carbon\Carbon::parse($gasto['fecha'])->format('d/m/Y') : $gasto['fecha']->format('d/m/Y') }}</td>
                                 <td>
-                                    <a href="{{ route('gastos.edit', $gasto->id_gasto) }}" class="btn btn-primary btn-xs">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form action="{{ route('gastos.destroy', $gasto->id_gasto) }}" method="POST" style="display:inline-block;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-xs" onclick="return confirm('¿Está seguro de eliminar este gasto?')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                                    @if($gasto['tipo'] === 'pago_tecnico')
+                                        <span class="badge badge-info">Pago Técnico</span>
+                                    @else
+                                        <span class="badge badge-warning">Gasto Taller</span>
+                                    @endif
+                                </td>
+                                <td><strong>{{ $gasto['concepto'] }}</strong></td>
+                                <td>{{ $gasto['descripcion'] ? Str::limit($gasto['descripcion'], 50) : '-' }}</td>
+                                <td class="text-right">
+                                    <span class="badge badge-danger">Bs {{ number_format($gasto['monto'], 2) }}</span>
+                                </td>
+                                <td>{{ $gasto['comprobante'] ?? 'N/A' }}</td>
+                                <td>{{ $gasto['empleado'] ? $gasto['empleado']->nombre . ' ' . $gasto['empleado']->apellido : 'Sistema' }}</td>
+                                <td>
+                                    @if($gasto['tipo'] === 'gasto_taller')
+                                        @canManage
+                                            <a href="{{ route('gastos.edit', $gasto['id']) }}" class="btn btn-primary btn-xs">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form action="{{ route('gastos.destroy', $gasto['id']) }}" method="POST" style="display:inline-block;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-xs" onclick="return confirm('¿Está seguro de eliminar este gasto?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        @endcanManage
+                                    @else
+                                        <a href="{{ route('pagos.index') }}" class="btn btn-info btn-xs" title="Ver en Pagos">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
@@ -103,7 +118,7 @@
                         <tr class="font-weight-bold">
                             <td colspan="4" class="text-right">TOTAL GENERAL:</td>
                             <td class="text-right">
-                                <span class="badge badge-danger">Bs {{ number_format($gastos->sum('monto'), 2) }}</span>
+                                <span class="badge badge-danger">Bs {{ number_format(collect($gastos)->sum('monto'), 2) }}</span>
                             </td>
                             <td colspan="3"></td>
                         </tr>
@@ -142,7 +157,7 @@
                             <tbody>
                                 @foreach($gastosPorConcepto as $concepto => $data)
                                     <tr>
-                                        <td>{{ $concepto }}</td>
+                                        <td>{{ Str::limit($concepto, 30) }}</td>
                                         <td class="text-center">{{ $data['cantidad'] }}</td>
                                         <td class="text-right">Bs {{ number_format($data['total'], 2) }}</td>
                                     </tr>
@@ -163,13 +178,20 @@
                 </div>
                 <div class="card-body">
                     <ul class="list-group">
-                        @foreach($gastos->take(5) as $gasto)
+                        @foreach(collect($gastos)->take(5) as $gasto)
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    <strong>{{ $gasto->concepto }}</strong><br>
-                                    <small class="text-muted">{{ $gasto->fecha->format('d/m/Y') }}</small>
+                                    <strong>{{ Str::limit($gasto['concepto'], 40) }}</strong><br>
+                                    <small class="text-muted">
+                                        {{ is_string($gasto['fecha']) ? \Carbon\Carbon::parse($gasto['fecha'])->format('d/m/Y') : $gasto['fecha']->format('d/m/Y') }}
+                                        @if($gasto['tipo'] === 'pago_tecnico')
+                                            <span class="badge badge-info badge-sm">Pago</span>
+                                        @else
+                                            <span class="badge badge-warning badge-sm">Gasto</span>
+                                        @endif
+                                    </small>
                                 </div>
-                                <span class="badge badge-danger badge-pill">Bs {{ number_format($gasto->monto, 2) }}</span>
+                                <span class="badge badge-danger badge-pill">Bs {{ number_format($gasto['monto'], 2) }}</span>
                             </li>
                         @endforeach
                     </ul>

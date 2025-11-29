@@ -123,7 +123,8 @@
                                     name="id_empleado">
                                 <option value="">Sistema (sin asignar)</option>
                                 @foreach($empleados as $empleado)
-                                    <option value="{{ $empleado->id_empleado }}" {{ old('id_empleado') == $empleado->id_empleado ? 'selected' : '' }}>
+                                    <option value="{{ $empleado->id_empleado }}" 
+                                        {{ (old('id_empleado', $empleadoActual) == $empleado->id_empleado) ? 'selected' : '' }}>
                                         {{ $empleado->nombre }} {{ $empleado->apellido }}
                                     </option>
                                 @endforeach
@@ -133,7 +134,13 @@
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror
-                            <small class="form-text text-muted">Opcional: empleado que realizó el gasto</small>
+                            <small class="form-text text-muted">
+                                @if($empleadoActual)
+                                    <i class="fas fa-info-circle text-success"></i> Autocompletado con tu usuario
+                                @else
+                                    Opcional: empleado que realizó el gasto
+                                @endif
+                            </small>
                         </div>
                     </div>
                 </div>
