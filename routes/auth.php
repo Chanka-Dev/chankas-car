@@ -11,35 +11,38 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('guest')->group(function () {
-    Route::get('register', [RegisteredUserController::class, 'create'])
-                ->name('register');
+// Rutas de autenticación con prefijo /panel/auth (obfuscadas)
+Route::prefix('panel')->group(function () {
+    Route::middleware('guest')->group(function () {
+        Route::get('auth', [AuthenticatedSessionController::class, 'create'])
+                    ->name('login'); // Nombre principal para compatibilidad Laravel
 
-    Route::post('register', [RegisteredUserController::class, 'store'])
-                ->middleware(['throttle:3,10', 'recaptcha']); // Máximo 3 registros cada 10 minutos
+        Route::post('auth', [AuthenticatedSessionController::class, 'store'])
+                    ->middleware(['throttle:5,1', 'recaptcha']); // Máximo 5 intentos de login por minuto
 
-    Route::get('login', [AuthenticatedSessionController::class, 'create'])
-                ->name('login');
+        Route::get('register', [RegisteredUserController::class, 'create'])
+                    ->name('register');
 
-    Route::post('login', [AuthenticatedSessionController::class, 'store'])
-                ->middleware(['throttle:5,1', 'recaptcha']); // Máximo 5 intentos de login por minuto
+        Route::post('register', [RegisteredUserController::class, 'store'])
+                    ->middleware(['throttle:3,10', 'recaptcha']); // Máximo 3 registros cada 10 minutos
 
-    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
-                ->name('password.request');
+        Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
+                    ->name('password.request');
 
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
-                ->middleware('throttle:3,10') // Máximo 3 intentos cada 10 minutos
-                ->name('password.email');
+        Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
+                    ->middleware('throttle:3,10') // Máximo 3 intentos cada 10 minutos
+                    ->name('password.email');
 
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-                ->name('password.reset');
+        Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
+                    ->name('password.reset');
 
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
-                ->middleware('throttle:3,10') // Máximo 3 resets cada 10 minutos
-                ->name('password.store');
+        Route::post('reset-password', [NewPasswordController::class, 'store'])
+                    ->middleware('throttle:3,10') // Máximo 3 resets cada 10 minutos
+                    ->name('password.store');
+    });
 });
 
-Route::middleware('auth')->group(function () {
+Route::prefix('panel')->middleware('auth')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)
                 ->name('verification.notice');
 
@@ -57,7 +60,9 @@ Route::middleware('auth')->group(function () {
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
 
     Route::put('password', [PasswordController::class, 'update'])->name('password.update');
-
-    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
-                ->name('logout');
 });
+
+// Logout fuera del prefijo panel para que funcione desde cualquier ruta
+Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
+            ->middleware('auth')
+            ->name('logout');

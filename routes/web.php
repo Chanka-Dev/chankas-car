@@ -14,13 +14,17 @@ use App\Http\Controllers\GastoTallerController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\PublicController;
 
-// Rutas públicas (login)
+// Ruta pública - Landing Page
+Route::get('/', [PublicController::class, 'index'])->name('home');
+
+// Rutas de autenticación (login movido a /panel/auth)
 require __DIR__.'/auth.php';
 
 // Rutas protegidas - requieren autenticación
 Route::middleware(['auth', 'throttle:120,1'])->group(function () { // 120 peticiones por minuto para usuarios autenticados
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Rutas de solo lectura para todos los roles
     Route::get('/trabajos/{trabajo}/detalle-venta', [TrabajoController::class, 'detalleVenta'])->name('trabajos.detalle-venta');
