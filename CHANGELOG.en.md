@@ -10,6 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased] - In development
 
 ### Added
+- 🛡️ **Security Express - Phase 1** (Public domain protection)
+  - **Fail2Ban integrated**: Automatic IP blocking after 5 failed login attempts
+  - **Google reCAPTCHA v3**: Invisible bot protection on login and registration
+  - **HTTP Security Headers**: HSTS, CSP, X-Frame-Options, X-Content-Type-Options
+  - Failed login attempt logging with IP, email and user agent
+  - Secure cookie configuration (httpOnly, sameSite, secure)
+  - Custom Laravel jail with 1-hour bantime
+  - `VerifyRecaptcha` middleware with minimum score of 0.5
+  - `SecurityHeaders` middleware applied globally
+
 - 💼 **Grouped technician payment view**
   - New `/pagos/agrupado` view with consolidated services by date and type
   - Groups quantities of identical services (e.g., "3x SIMPLE WASH")
