@@ -53,33 +53,32 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="concepto">Concepto</label>
-                    <input type="text" 
-                           class="form-control @error('concepto') is-invalid @enderror" 
-                           id="concepto" 
-                           name="concepto" 
-                           placeholder="Ej: Luz, Agua, Herramientas, Alquiler" 
-                           value="{{ old('concepto') }}"
-                           list="conceptos-list"
-                           required>
-                    <datalist id="conceptos-list">
-                        <option value="Luz">
-                        <option value="Agua">
-                        <option value="Internet">
-                        <option value="Alquiler">
-                        <option value="Herramientas">
-                        <option value="Material de limpieza">
-                        <option value="Repuestos">
-                        <option value="Mantenimiento">
-                        <option value="Combustible">
-                        <option value="Otros">
-                    </datalist>
-                    @error('concepto')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="concepto">Concepto</label>
+                            <select class="form-control select2-concepto @error('concepto') is-invalid @enderror" 
+                                    id="concepto" 
+                                    name="concepto" 
+                                    data-placeholder="Selecciona un concepto o escribe uno nuevo..."
+                                    required>
+                                <option value=""></option>
+                                @foreach($conceptos as $c)
+                                    <option value="{{ $c }}" {{ old('concepto') == $c ? 'selected' : '' }}>
+                                        {{ $c }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('concepto')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                            <small class="form-text text-muted">
+                                <i class="fas fa-lightbulb"></i> Puedes seleccionar un concepto existente o escribir uno nuevo
+                            </small>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -158,5 +157,93 @@
 @stop
 
 @section('css')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css" rel="stylesheet" />
     @vite('resources/css/adminlte-theme.css')
+    <style>
+        /* Hacer que Select2 se vea más como un campo desplegable tradicional */
+        .select2-concepto + .select2-container .select2-selection {
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            min-height: 38px;
+            padding: 0.375rem 0.75rem;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        
+        /* Asegurar que la flecha sea visible y clara */
+        .select2-concepto + .select2-container .select2-selection__arrow {
+            height: 36px;
+            position: absolute;
+            top: 1px;
+            right: 1px;
+            width: 20px;
+        }
+        
+        .select2-concepto + .select2-container .select2-selection__arrow b {
+            border-color: #495057 transparent transparent transparent;
+            border-style: solid;
+            border-width: 5px 4px 0 4px;
+            height: 0;
+            left: 50%;
+            margin-left: -4px;
+            margin-top: -2px;
+            position: absolute;
+            top: 50%;
+            width: 0;
+        }
+        
+        /* Estado hover */
+        .select2-concepto + .select2-container .select2-selection:hover {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        /* Estado focus */
+        .select2-concepto + .select2-container--focus .select2-selection {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        /* Hacer el placeholder más visible */
+        .select2-concepto + .select2-container .select2-selection__placeholder {
+            color: #6c757d;
+            font-style: italic;
+        }
+    </style>
+@stop
+
+@section('js')
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Inicializar Select2 para conceptos
+            $('.select2-concepto').select2({
+                theme: 'bootstrap4',
+                tags: true,
+                placeholder: "Selecciona un concepto o escribe uno nuevo...",
+                allowClear: true,
+                language: {
+                    noResults: function() {
+                        return "No se encontró el concepto. Escribe para crear uno nuevo.";
+                    },
+                    searching: function() {
+                        return "Buscando...";
+                    }
+                },
+                createTag: function(params) {
+                    var term = $.trim(params.term);
+                    if (term === '') {
+                        return null;
+                    }
+                    return {
+                        id: term,
+                        text: term + ' (nuevo)',
+                        newTag: true
+                    };
+                }
+            });
+        });
+    </script>
 @stop

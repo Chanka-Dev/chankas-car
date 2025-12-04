@@ -7,6 +7,79 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## [No publicado] - En desarrollo
+
+### Agregado
+- 💼 **Vista agrupada de pagos a técnicos**
+  - Nueva vista `/pagos/agrupado` con servicios consolidados por fecha y tipo
+  - Agrupa cantidades de servicios idénticos (ej: "3x LAVADO SIMPLE")
+  - Exportación PDF con formato optimizado para impresión
+  - Botón de alternancia entre vista detallada y agrupada
+  - Facilita lectura rápida de comisiones por tipo de servicio
+
+- 🔧 **Comando de verificación de comisiones MANT**
+  - `php artisan check:mant` - Compara comisiones Excel vs BD
+  - Detecta servicios de mantenimiento con discrepancias
+  - Reporta diferencias en precios técnicos
+  - Soporte para archivos Excel personalizados con `--file=`
+  - Identifica servicios faltantes en base de datos
+
+- 🎯 **Select2 mejorado en gastos**
+  - Campo `concepto` convertido de datalist a Select2
+  - Búsqueda inteligente en conceptos existentes
+  - Soporte para crear nuevos conceptos con etiqueta "(nuevo)"
+  - Estilos mejorados: bordes, flechas visibles, efectos hover/focus
+  - Layout responsive: ancho 50% (col-md-6) para mejor legibilidad
+  - Carga dinámica desde BD de conceptos únicos ordenados
+
+- 🎨 **Select2 mejorado en trabajos**
+  - Selector de piezas convertido a Select2 con búsqueda
+  - Estilos CSS unificados (50+ líneas) para apariencia de dropdown nativo
+  - Inicialización automática en piezas agregadas manualmente
+  - Inicialización automática en piezas cargadas desde servicios
+  - Temas Bootstrap 4 con placeholder en cursiva
+  - Efectos visuales: border-color #80bdff en hover/focus con box-shadow
+
+### Cambiado
+- 🔐 **Permisos de gastos reasignados**
+  - Movido de middleware `admin` a `admin,cajero`
+  - Cajeros ahora pueden gestionar gastos del taller
+  - Alineado con permisos de trabajos y pagos
+  - Eliminado `except(['index', 'show'])` para mayor seguridad
+
+- 📊 **Controller de pagos extendido**
+  - Agregados métodos `indexAgrupado()` y `exportarPdfAgrupado()`
+  - Lógica de agrupación por fecha → servicio → cantidades
+  - Cálculo de subtotales por día y tipo de servicio
+  - Mismo sistema de filtros que vista detallada
+
+### Arreglado
+- 🔍 **Query de conceptos en GastoTallerController**
+  - Agregada consulta `$conceptos` en métodos `create()` y `edit()`
+  - Obtiene lista única de conceptos ordenados alfabéticamente
+  - Alimenta Select2 con datos reales de la base de datos
+
+- 🌐 **Rutas de pagos agrupados**
+  - `GET /pagos/agrupado` → `pagos.index-agrupado`
+  - `GET /pagos/exportar-pdf-agrupado` → `pagos.exportar-pdf-agrupado`
+  - Integradas en middleware `admin,cajero`
+
+### Técnico
+- **3 archivos nuevos**:
+  - `app/Console/Commands/CheckMantComisiones.php` - Comando de verificación
+  - `resources/views/pagos/index-agrupado.blade.php` - Vista agrupada completa
+  - `resources/views/pagos/pdf-agrupado.blade.php` - PDF compacto optimizado
+- **10 archivos modificados**:
+  - Controllers: `GastoTallerController.php`, `PagoController.php`
+  - Vistas gastos: `create.blade.php`, `edit.blade.php` (Select2 + CSS)
+  - Vistas trabajos: `create.blade.php`, `edit.blade.php` (Select2 piezas + CSS)
+  - Vistas pagos: `index.blade.php` (botón vista agrupada)
+  - Rutas: `web.php` (rutas agrupadas + permisos gastos)
+- **Dependencias**: Select2 4.1.0-rc.0, Select2-Bootstrap4-Theme 1.5.2
+- **Compatibilidad**: col-md-6 (50% ancho) para fields individuales, col-md-4 para pares
+
+---
+
 ## [1.0.1] - 2025-11-26
 
 ### Agregado

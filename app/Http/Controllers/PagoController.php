@@ -235,4 +235,188 @@ class PagoController extends Controller
 
         return $pdf->download($nombreArchivo);
     }
+
+    /**
+     * Mostrar vista agrupada por tipo de servicio
+     */
+    public function indexAgrupado(Request $request)
+    {
+        $empleados = Empleado::orderBy('nombre')->get();
+        
+        $trabajos = collect();
+        $totalComision = 0;
+        $totalPagado = 0;
+        $saldoPendiente = 0;
+        $empleadoSeleccionado = null;
+        $fechaInicio = null;
+        $fechaFin = null;
+        $serviciosPorFecha = [];
+
+        // Si hay filtros aplicados
+        if ($request->has('id_empleado') && $request->id_empleado) {
+            $request->validate([
+                'id_empleado' => 'required|exists:empleados,id_empleado',
+                'fecha_inicio' => 'required|date',
+                'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
+            ]);
+
+            $empleadoSeleccionado = Empleado::find($request->id_empleado);
+            $fechaInicio = $request->fecha_inicio;
+            $fechaFin = $request->fecha_fin;
+
+            // Obtener trabajos del empleado en el rango de fechas
+            $trabajos = Trabajo::with(['cliente', 'trabajoServicios.servicio'])
+                ->where('id_empleado', $request->id_empleado)
+                ->whereBetween('fecha_trabajo', [$fechaInicio, $fechaFin])
+                ->orderBy('fecha_trabajo', 'asc')
+                ->get();
+
+            // Agrupar por fecha y luego por servicio
+            $trabajosPorFecha = $trabajos->groupBy(function($trabajo) {
+                return $trabajo->fecha_trabajo->format('Y-m-d');
+            });
+
+            foreach($trabajosPorFecha as $fecha => $trabajosDia) {
+                $serviciosAgrupados = [];
+                
+                foreach($trabajosDia as $trabajo) {
+                    foreach($trabajo->trabajoServicios as $ts) {
+                        $nombreServicio = $ts->servicio->nombre;
+                        
+                        if(!isset($serviciosAgrupados[$nombreServicio])) {
+                            $serviciosAgrupados[$nombreServicio] = [
+                                'cantidad' => 0,
+                                'total_tecnico' => 0
+                            ];
+                        }
+                        
+                        $serviciosAgrupados[$nombreServicio]['cantidad'] += $ts->cantidad;
+                        $serviciosAgrupados[$nombreServicio]['total_tecnico'] += $ts->importe_tecnico;
+                    }
+                }
+                
+                $serviciosPorFecha[$fecha] = $serviciosAgrupados;
+            }
+
+            // Calcular total de comisiones
+            $totalComision = $trabajos->sum(function($trabajo) {
+                return $trabajo->total_tecnico;
+            });
+
+            // Calcular total pagado en este período
+            $totalPagado = PagoTecnico::where('id_empleado', $request->id_empleado)
+                ->where(function($query) use ($fechaInicio, $fechaFin) {
+                    $query->whereBetween('periodo_inicio', [$fechaInicio, $fechaFin])
+                          ->orWhereBetween('periodo_fin', [$fechaInicio, $fechaFin]);
+                })
+                ->sum('monto_pagado');
+
+            $saldoPendiente = $totalComision - $totalPagado;
+        }
+
+        // Obtener todos los saldos pendientes
+        $saldosPendientes = $this->calcularSaldosPendientes();
+
+        // Obtener historial de pagos con paginación
+        $historialPagos = PagoTecnico::with('empleado')
+            ->orderBy('fecha_pago', 'desc')
+            ->paginate(20);
+
+        // Estadísticas de historial
+        $totalPagosRealizados = PagoTecnico::sum('monto_pagado');
+        $pagosMesActual = PagoTecnico::whereYear('fecha_pago', now()->year)
+            ->whereMonth('fecha_pago', now()->month)
+            ->sum('monto_pagado');
+
+        return view('pagos.index-agrupado', compact(
+            'empleados',
+            'trabajos',
+            'serviciosPorFecha',
+            'totalComision',
+            'totalPagado',
+            'saldoPendiente',
+            'empleadoSeleccionado',
+            'fechaInicio',
+            'fechaFin',
+            'saldosPendientes',
+            'historialPagos',
+            'totalPagosRealizados',
+            'pagosMesActual'
+        ));
+    }
+
+    /**
+     * Exportar a PDF con vista agrupada por tipo de servicio
+     */
+    public function exportarPdfAgrupado(Request $request)
+    {
+        $request->validate([
+            'id_empleado' => 'required|exists:empleados,id_empleado',
+            'fecha_inicio' => 'required|date',
+            'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
+        ]);
+
+        $empleado = Empleado::with('cargo')->find($request->id_empleado);
+        $fechaInicio = $request->fecha_inicio;
+        $fechaFin = $request->fecha_fin;
+
+        // Obtener trabajos del empleado en el rango de fechas
+        $trabajos = Trabajo::with(['cliente', 'trabajoServicios.servicio'])
+            ->where('id_empleado', $request->id_empleado)
+            ->whereBetween('fecha_trabajo', [$fechaInicio, $fechaFin])
+            ->orderBy('fecha_trabajo', 'asc')
+            ->get();
+
+        // Agrupar servicios por fecha y tipo
+        $serviciosPorFecha = [];
+        
+        foreach ($trabajos as $trabajo) {
+            $fecha = $trabajo->fecha_trabajo->format('Y-m-d');
+            
+            if (!isset($serviciosPorFecha[$fecha])) {
+                $serviciosPorFecha[$fecha] = [];
+            }
+            
+            foreach ($trabajo->trabajoServicios as $ts) {
+                $nombreServicio = $ts->servicio ? $ts->servicio->nombre : 'Servicio no encontrado';
+                
+                if (!isset($serviciosPorFecha[$fecha][$nombreServicio])) {
+                    $serviciosPorFecha[$fecha][$nombreServicio] = [
+                        'cantidad' => 0,
+                        'total_tecnico' => 0
+                    ];
+                }
+                
+                $serviciosPorFecha[$fecha][$nombreServicio]['cantidad'] += 1;
+                $serviciosPorFecha[$fecha][$nombreServicio]['total_tecnico'] += $ts->importe_tecnico;
+            }
+        }
+
+        $totalComision = $trabajos->sum(function($trabajo) {
+            return $trabajo->total_tecnico;
+        });
+
+        // Obtener total pagado
+        $totalPagado = PagoTecnico::where('id_empleado', $request->id_empleado)
+            ->whereBetween('periodo_inicio', [$fechaInicio, $fechaFin])
+            ->orWhereBetween('periodo_fin', [$fechaInicio, $fechaFin])
+            ->sum('monto_pagado');
+
+        $saldoPendiente = $totalComision - $totalPagado;
+
+        // Generar PDF
+        $pdf = Pdf::loadView('pagos.pdf-agrupado', compact(
+            'empleado',
+            'fechaInicio',
+            'fechaFin',
+            'serviciosPorFecha',
+            'totalComision',
+            'totalPagado',
+            'saldoPendiente'
+        ));
+
+        $nombreArchivo = 'pago_agrupado_' . $empleado->nombre . '_' . $empleado->apellido . '_' . date('Y-m-d') . '.pdf';
+
+        return $pdf->download($nombreArchivo);
+    }
 }

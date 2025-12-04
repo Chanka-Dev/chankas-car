@@ -10,7 +10,7 @@ class GastoTallerController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:admin,cajero')->except(['index', 'show']);
+        $this->middleware('role:admin,cajero');
     }
 
     public function index()
@@ -61,7 +61,14 @@ class GastoTallerController extends Controller
     {
         $empleados = Empleado::orderBy('nombre')->get();
         $empleadoActual = auth()->user()->id_empleado;
-        return view('gastos.create', compact('empleados', 'empleadoActual'));
+        
+        // Obtener conceptos únicos de gastos existentes
+        $conceptos = GastoTaller::select('concepto')
+            ->distinct()
+            ->orderBy('concepto')
+            ->pluck('concepto');
+        
+        return view('gastos.create', compact('empleados', 'empleadoActual', 'conceptos'));
     }
 
     public function store(Request $request)
@@ -90,7 +97,14 @@ class GastoTallerController extends Controller
     {
         $empleados = Empleado::orderBy('nombre')->get();
         $empleadoActual = auth()->user()->id_empleado;
-        return view('gastos.edit', compact('gasto', 'empleados', 'empleadoActual'));
+        
+        // Obtener conceptos únicos de gastos existentes
+        $conceptos = GastoTaller::select('concepto')
+            ->distinct()
+            ->orderBy('concepto')
+            ->pluck('concepto');
+        
+        return view('gastos.edit', compact('gasto', 'empleados', 'empleadoActual', 'conceptos'));
     }
 
     public function update(Request $request, GastoTaller $gasto)

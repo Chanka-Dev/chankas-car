@@ -46,7 +46,6 @@ Route::middleware(['auth', 'throttle:120,1'])->group(function () { // 120 petici
             'proveedores' => 'proveedor'
         ]);
         Route::resource('inventarios', InventarioController::class);
-        Route::resource('gastos', GastoTallerController::class);
         Route::resource('users', UserController::class);
         Route::resource('activity-logs', ActivityLogController::class)->only(['index', 'show']);
     });
@@ -55,12 +54,15 @@ Route::middleware(['auth', 'throttle:120,1'])->group(function () { // 120 petici
     Route::middleware(['role:admin,cajero'])->group(function () {
         Route::resource('clientes', ClienteController::class);
         Route::resource('trabajos', TrabajoController::class);
+        Route::resource('gastos', GastoTallerController::class);
         
         // Rutas de pagos
         Route::get('/pagos', [PagoController::class, 'index'])->name('pagos.index');
+        Route::get('/pagos/agrupado', [PagoController::class, 'indexAgrupado'])->name('pagos.index-agrupado');
         Route::post('/pagos/registrar', [PagoController::class, 'registrarPago'])->name('pagos.registrar');
         Route::post('/pagos/saldo', [PagoController::class, 'pagarSaldo'])->name('pagos.pagar-saldo');
         Route::get('/pagos/exportar-pdf', [PagoController::class, 'exportarPdf'])->name('pagos.exportar-pdf');
+        Route::get('/pagos/exportar-pdf-agrupado', [PagoController::class, 'exportarPdfAgrupado'])->name('pagos.exportar-pdf-agrupado');
     });
 
     // Rutas de técnico - Solo consulta de trabajos asignados

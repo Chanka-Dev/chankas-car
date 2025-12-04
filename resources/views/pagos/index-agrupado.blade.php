@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', 'Pagos a Técnicos - Chankas Car')
+@section('title', 'Pagos a Técnicos (Agrupado) - Chankas Car')
 
 @section('content_header')
-    <h1>Pagos a Técnicos</h1>
+    <h1>Pagos a Técnicos - Vista Agrupada</h1>
 @stop
 
 @section('content')
@@ -43,12 +43,12 @@
         <div class="card-header">
             <h3 class="card-title">Filtrar Pagos por Técnico y Fechas</h3>
             <div class="card-tools">
-                <a href="{{ route('pagos.index-agrupado', request()->all()) }}" class="btn btn-sm btn-success">
-                    <i class="fas fa-layer-group"></i> Vista Agrupada
+                <a href="{{ route('pagos.index', request()->all()) }}" class="btn btn-sm btn-info">
+                    <i class="fas fa-list"></i> Vista Detallada
                 </a>
             </div>
         </div>
-        <form action="{{ route('pagos.index') }}" method="GET" id="form-filtros">
+        <form action="{{ route('pagos.index-agrupado') }}" method="GET" id="form-filtros">
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-4">
@@ -114,10 +114,10 @@
                     <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#modal-registrar-pago">
                         <i class="fas fa-dollar-sign"></i> Registrar Pago
                     </button>
-                    <a href="{{ route('pagos.exportar-pdf', ['id_empleado' => request('id_empleado'), 'fecha_inicio' => request('fecha_inicio'), 'fecha_fin' => request('fecha_fin')]) }}" 
+                    <a href="{{ route('pagos.exportar-pdf-agrupado', ['id_empleado' => request('id_empleado'), 'fecha_inicio' => request('fecha_inicio'), 'fecha_fin' => request('fecha_fin')]) }}" 
                        class="btn btn-danger btn-sm text-white" 
                        target="_blank">
-                        <i class="fas fa-file-pdf"></i> Exportar PDF
+                        <i class="fas fa-file-pdf"></i> Exportar PDF Agrupado
                     </a>
                 </div>
             </div>
@@ -152,21 +152,19 @@
                     </div>
                 </div>
 
-                @if($trabajos->count() > 0)
-                    @php
-                        $trabajosPorFecha = $trabajos->groupBy(function($trabajo) {
-                            return $trabajo->fecha_trabajo->format('Y-m-d');
-                        });
-                    @endphp
-
-                    @foreach($trabajosPorFecha as $fecha => $trabajosDia)
+                @if(count($serviciosPorFecha) > 0)
+                    @foreach($serviciosPorFecha as $fecha => $servicios)
                         <div class="card mb-3">
                             <div class="card-header bg-light">
                                 <h5 class="mb-0">
                                     <i class="fas fa-calendar-day"></i> 
                                     {{ \Carbon\Carbon::parse($fecha)->format('d/m/Y') }}
+                                    @php
+                                        $totalDia = array_sum(array_column($servicios, 'total_tecnico'));
+                                        $totalServicios = array_sum(array_column($servicios, 'cantidad'));
+                                    @endphp
                                     <span class="badge badge-primary float-right">
-                                        {{ $trabajosDia->count() }} trabajo(s) - Bs {{ number_format($trabajosDia->sum('total_tecnico'), 2) }}
+                                        {{ $totalServicios }} servicio(s) - Bs {{ number_format($totalDia, 2) }}
                                     </span>
                                 </h5>
                             </div>
@@ -174,31 +172,19 @@
                                 <table class="table table-sm table-striped mb-0">
                                     <thead>
                                         <tr>
-                                            <th>Placa</th>
-                                            <th>Servicios Realizados</th>
+                                            <th>Tipo de Servicio</th>
+                                            <th class="text-center">Cantidad</th>
                                             <th class="text-right">Comisión</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($trabajosDia as $trabajo)
+                                        @foreach($servicios as $nombreServicio => $datos)
                                             <tr>
-                                                <td><strong>{{ $trabajo->cliente ? $trabajo->cliente->placas : 'SIN PLACA' }}</strong></td>
-                                                <td>
-                                                    <ul class="mb-0 pl-3">
-                                                        @foreach($trabajo->trabajoServicios as $ts)
-                                                            <li>
-                                                                <small>
-                                                                    {{ $ts->servicio->nombre }}
-                                                                    @if($ts->cantidad > 1)
-                                                                        <span class="badge badge-info">x{{ $ts->cantidad }}</span>
-                                                                    @endif
-                                                                    (Bs {{ number_format($ts->importe_tecnico, 2) }})
-                                                                </small>
-                                                            </li>
-                                                        @endforeach
-                                                    </ul>
+                                                <td><strong>{{ $nombreServicio }}</strong></td>
+                                                <td class="text-center">
+                                                    <span class="badge badge-info">{{ $datos['cantidad'] }}</span>
                                                 </td>
-                                                <td class="text-right">Bs {{ number_format($trabajo->total_tecnico, 2) }}</td>
+                                                <td class="text-right">Bs {{ number_format($datos['total_tecnico'], 2) }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -206,7 +192,7 @@
                                         <tr>
                                             <td colspan="2" class="text-right"><strong>Subtotal del día:</strong></td>
                                             <td class="text-right">
-                                                <strong>Bs {{ number_format($trabajosDia->sum('total_tecnico'), 2) }}</strong>
+                                                <strong>Bs {{ number_format($totalDia, 2) }}</strong>
                                             </td>
                                         </tr>
                                     </tfoot>
@@ -251,113 +237,10 @@
         <div class="card">
             <div class="card-body text-center text-muted">
                 <i class="fas fa-info-circle fa-3x mb-3"></i>
-                <p>Seleccione un técnico y un rango de fechas para ver el detalle de pagos.</p>
+                <p>Seleccione un técnico y un rango de fechas para ver el detalle de pagos agrupado.</p>
             </div>
         </div>
     @endif
-
-    <!-- Modal Registrar Pago -->
-    <div class="modal fade" id="modal-registrar-pago" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="{{ route('pagos.registrar') }}" method="POST">
-                    @csrf
-                    <div class="modal-header bg-success">
-                        <h5 class="modal-title">Registrar Pago</h5>
-                        <button type="button" class="close" data-dismiss="modal">
-                            <span>&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" name="id_empleado" value="{{ request('id_empleado') }}">
-                        <input type="hidden" name="periodo_inicio" value="{{ request('fecha_inicio') }}">
-                        <input type="hidden" name="periodo_fin" value="{{ request('fecha_fin') }}">
-
-                        <div class="form-group">
-                            <label>Técnico</label>
-                            <input type="text" class="form-control" value="{{ $empleadoSeleccionado ? $empleadoSeleccionado->nombre . ' ' . $empleadoSeleccionado->apellido : '' }}" readonly>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Total a Pagar</label>
-                            <input type="text" class="form-control" value="Bs {{ number_format($totalComision ?? 0, 2) }}" readonly>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="fecha_pago">Fecha de Pago</label>
-                            <input type="date" class="form-control" id="fecha_pago" name="fecha_pago" value="{{ date('Y-m-d') }}" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="monto_pagado">Monto a Pagar</label>
-                            <input type="number" class="form-control" id="monto_pagado" name="monto_pagado" step="0.01" min="0.01" value="{{ $totalComision ?? 0 }}" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="tipo_pago">Tipo de Pago</label>
-                            <select class="form-control" id="tipo_pago" name="tipo_pago" required>
-                                <option value="completo">Pago Completo</option>
-                                <option value="parcial">Pago Parcial</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="observaciones_pago">Observaciones</label>
-                            <textarea class="form-control" id="observaciones_pago" name="observaciones" rows="3"></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-success">Registrar Pago</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Pagar Saldo -->
-    <div class="modal fade" id="modal-pagar-saldo" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="{{ route('pagos.pagar-saldo') }}" method="POST">
-                    @csrf
-                    <div class="modal-header bg-warning">
-                        <h5 class="modal-title">Pagar Saldo Pendiente</h5>
-                        <button type="button" class="close" data-dismiss="modal">
-                            <span>&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" name="id_empleado" id="saldo-empleado-id">
-
-                        <div class="form-group">
-                            <label>Técnico</label>
-                            <input type="text" class="form-control" id="saldo-empleado-nombre" readonly>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Saldo Pendiente</label>
-                            <input type="text" class="form-control" id="saldo-pendiente-texto" readonly>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="monto_pagar_saldo">Monto a Pagar</label>
-                            <input type="number" class="form-control" id="monto_pagar_saldo" name="monto_pagado" step="0.01" min="0.01" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="observaciones_saldo">Observaciones</label>
-                            <textarea class="form-control" id="observaciones_saldo" name="observaciones" rows="3"></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-warning">Pagar Saldo</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
     <!-- Historial de Pagos Realizados -->
     <div class="card card-primary">
@@ -459,6 +342,109 @@
                     <i class="fas fa-info-circle"></i> No hay pagos registrados aún.
                 </div>
             @endif
+        </div>
+    </div>
+
+    <!-- Modal Registrar Pago -->
+    <div class="modal fade" id="modal-registrar-pago" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ route('pagos.registrar') }}" method="POST">
+                    @csrf
+                    <div class="modal-header bg-success">
+                        <h5 class="modal-title">Registrar Pago</h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="id_empleado" value="{{ request('id_empleado') }}">
+                        <input type="hidden" name="periodo_inicio" value="{{ request('fecha_inicio') }}">
+                        <input type="hidden" name="periodo_fin" value="{{ request('fecha_fin') }}">
+
+                        <div class="form-group">
+                            <label>Técnico</label>
+                            <input type="text" class="form-control" value="{{ $empleadoSeleccionado ? $empleadoSeleccionado->nombre . ' ' . $empleadoSeleccionado->apellido : '' }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Total a Pagar</label>
+                            <input type="text" class="form-control" value="Bs {{ number_format($totalComision ?? 0, 2) }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fecha_pago">Fecha de Pago</label>
+                            <input type="date" class="form-control" id="fecha_pago" name="fecha_pago" value="{{ date('Y-m-d') }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="monto_pagado">Monto a Pagar</label>
+                            <input type="number" class="form-control" id="monto_pagado" name="monto_pagado" step="0.01" min="0.01" value="{{ $totalComision ?? 0 }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tipo_pago">Tipo de Pago</label>
+                            <select class="form-control" id="tipo_pago" name="tipo_pago" required>
+                                <option value="completo">Pago Completo</option>
+                                <option value="parcial">Pago Parcial</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="observaciones_pago">Observaciones</label>
+                            <textarea class="form-control" id="observaciones_pago" name="observaciones" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Registrar Pago</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Pagar Saldo -->
+    <div class="modal fade" id="modal-pagar-saldo" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ route('pagos.pagar-saldo') }}" method="POST">
+                    @csrf
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title">Pagar Saldo Pendiente</h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="id_empleado" id="saldo-empleado-id">
+
+                        <div class="form-group">
+                            <label>Técnico</label>
+                            <input type="text" class="form-control" id="saldo-empleado-nombre" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Saldo Pendiente</label>
+                            <input type="text" class="form-control" id="saldo-pendiente-texto" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="monto_pagar_saldo">Monto a Pagar</label>
+                            <input type="number" class="form-control" id="monto_pagar_saldo" name="monto_pagado" step="0.01" min="0.01" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="observaciones_saldo">Observaciones</label>
+                            <textarea class="form-control" id="observaciones_saldo" name="observaciones" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-warning">Pagar Saldo</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 @stop

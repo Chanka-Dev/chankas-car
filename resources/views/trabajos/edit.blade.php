@@ -447,15 +447,60 @@
 @section('css')
     @vite('resources/css/adminlte-theme.css')
     <style>
-        /* Ajustar Select2 para Bootstrap 4 */
+        /* Estilos mejorados para Select2 - apariencia de desplegable */
         .select2-container--bootstrap4 .select2-selection--single {
             height: calc(2.25rem + 2px) !important;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            padding: 0.375rem 0.75rem;
+            background-color: #fff;
+            cursor: pointer;
         }
+        
         .select2-container--bootstrap4 .select2-selection--single .select2-selection__rendered {
             line-height: calc(2.25rem) !important;
+            padding-left: 0;
+            color: #495057;
         }
+        
         .select2-container--bootstrap4 .select2-selection--single .select2-selection__arrow {
             height: calc(2.25rem) !important;
+            position: absolute;
+            top: 1px;
+            right: 1px;
+            width: 20px;
+        }
+        
+        .select2-container--bootstrap4 .select2-selection--single .select2-selection__arrow b {
+            border-color: #495057 transparent transparent transparent;
+            border-style: solid;
+            border-width: 5px 4px 0 4px;
+            height: 0;
+            left: 50%;
+            margin-left: -4px;
+            margin-top: -2px;
+            position: absolute;
+            top: 50%;
+            width: 0;
+        }
+        
+        /* Estado hover */
+        .select2-container--bootstrap4 .select2-selection--single:hover {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        /* Estado focus */
+        .select2-container--bootstrap4.select2-container--focus .select2-selection--single {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        /* Placeholder más visible */
+        .select2-container--bootstrap4 .select2-selection--single .select2-selection__placeholder {
+            color: #6c757d;
+            font-style: italic;
         }
     </style>
 @stop

@@ -7,6 +7,79 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased] - In development
+
+### Added
+- 💼 **Grouped technician payment view**
+  - New `/pagos/agrupado` view with consolidated services by date and type
+  - Groups quantities of identical services (e.g., "3x SIMPLE WASH")
+  - PDF export with print-optimized format
+  - Toggle button between detailed and grouped views
+  - Facilitates quick reading of commissions by service type
+
+- 🔧 **MANT commission verification command**
+  - `php artisan check:mant` - Compares Excel commissions vs DB
+  - Detects maintenance services with discrepancies
+  - Reports differences in technician prices
+  - Support for custom Excel files with `--file=`
+  - Identifies services missing in database
+
+- 🎯 **Enhanced Select2 in expenses**
+  - `concepto` field converted from datalist to Select2
+  - Smart search in existing concepts
+  - Support for creating new concepts with "(new)" tag
+  - Improved styles: borders, visible arrows, hover/focus effects
+  - Responsive layout: 50% width (col-md-6) for better readability
+  - Dynamic loading from DB of unique ordered concepts
+
+- 🎨 **Enhanced Select2 in work orders**
+  - Parts selector converted to Select2 with search
+  - Unified CSS styles (50+ lines) for native dropdown appearance
+  - Auto-initialization on manually added parts
+  - Auto-initialization on parts loaded from services
+  - Bootstrap 4 themes with italic placeholder
+  - Visual effects: border-color #80bdff on hover/focus with box-shadow
+
+### Changed
+- 🔐 **Expense permissions reassigned**
+  - Moved from `admin` middleware to `admin,cajero`
+  - Cashiers can now manage workshop expenses
+  - Aligned with work orders and payments permissions
+  - Removed `except(['index', 'show'])` for enhanced security
+
+- 📊 **Extended payment controller**
+  - Added `indexAgrupado()` and `exportarPdfAgrupado()` methods
+  - Grouping logic by date → service → quantities
+  - Calculation of subtotals by day and service type
+  - Same filter system as detailed view
+
+### Fixed
+- 🔍 **Concepts query in GastoTallerController**
+  - Added `$conceptos` query in `create()` and `edit()` methods
+  - Gets unique list of alphabetically ordered concepts
+  - Feeds Select2 with real database data
+
+- 🌐 **Grouped payment routes**
+  - `GET /pagos/agrupado` → `pagos.index-agrupado`
+  - `GET /pagos/exportar-pdf-agrupado` → `pagos.exportar-pdf-agrupado`
+  - Integrated in `admin,cajero` middleware
+
+### Technical
+- **3 new files**:
+  - `app/Console/Commands/CheckMantComisiones.php` - Verification command
+  - `resources/views/pagos/index-agrupado.blade.php` - Complete grouped view
+  - `resources/views/pagos/pdf-agrupado.blade.php` - Optimized compact PDF
+- **10 modified files**:
+  - Controllers: `GastoTallerController.php`, `PagoController.php`
+  - Expense views: `create.blade.php`, `edit.blade.php` (Select2 + CSS)
+  - Work order views: `create.blade.php`, `edit.blade.php` (Select2 parts + CSS)
+  - Payment views: `index.blade.php` (grouped view button)
+  - Routes: `web.php` (grouped routes + expense permissions)
+- **Dependencies**: Select2 4.1.0-rc.0, Select2-Bootstrap4-Theme 1.5.2
+- **Compatibility**: col-md-6 (50% width) for individual fields, col-md-4 for pairs
+
+---
+
 ## [1.0.1] - 2025-11-26
 
 ### Added
