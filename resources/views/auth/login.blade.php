@@ -267,6 +267,11 @@
             }
         }
     </style>
+
+    <!-- Google reCAPTCHA v3 -->
+    @if(config('services.recaptcha.site_key'))
+    <script src="https://www.google.com/recaptcha/api.js?render={{ config('services.recaptcha.site_key') }}"></script>
+    @endif
 </head>
 <body>
     <div class="login-container">
@@ -345,12 +350,38 @@
     </div>
 
     <script>
-        // Animación al enviar el formulario
+        // reCAPTCHA v3 - Generar token antes de submit
+        @if(config('services.recaptcha.site_key'))
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = this;
+            const btn = form.querySelector('.btn-login');
+            
+            grecaptcha.ready(function() {
+                grecaptcha.execute('{{ config('services.recaptcha.site_key') }}', {action: 'login'})
+                    .then(function(token) {
+                        // Insertar token en el formulario
+                        let input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'g-recaptcha-response';
+                        input.value = token;
+                        form.appendChild(input);
+                        
+                        // Animar botón y enviar
+                        btn.disabled = true;
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+                        form.submit();
+                    });
+            });
+        });
+        @else
+        // Animación al enviar el formulario (sin reCAPTCHA)
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             const btn = this.querySelector('.btn-login');
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando sesión...';
         });
+        @endif
 
         // Focus animation
         const inputs = document.querySelectorAll('.form-control');

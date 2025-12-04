@@ -13,6 +13,39 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <!-- Google reCAPTCHA v3 -->
+        @if(config('services.recaptcha.site_key'))
+        <script src="https://www.google.com/recaptcha/api.js?render={{ config('services.recaptcha.site_key') }}"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.querySelector('form');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        const submitBtn = form.querySelector('button[type="submit"]');
+                        
+                        grecaptcha.ready(function() {
+                            grecaptcha.execute('{{ config('services.recaptcha.site_key') }}', {action: 'register'})
+                                .then(function(token) {
+                                    let input = document.createElement('input');
+                                    input.type = 'hidden';
+                                    input.name = 'g-recaptcha-response';
+                                    input.value = token;
+                                    form.appendChild(input);
+                                    
+                                    if (submitBtn) {
+                                        submitBtn.disabled = true;
+                                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+                                    }
+                                    form.submit();
+                                });
+                        });
+                    });
+                }
+            });
+        </script>
+        @endif
     </head>
     <body class="font-sans text-gray-900 antialiased">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
