@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Chankas Car - Taller especializado GNV en Sucre. Conversión a 3ra y 5ta generación, mantenimiento, certificación. Más de 20 años de experiencia.">
+    <meta name="description" content="Chanka's Car - Taller especializado GNV en Sucre. Conversión a 3ra y 5ta generación, mantenimiento, certificación. Más de 20 años de experiencia.">
     <meta name="keywords" content="GNV Sucre, conversión GNV, 3ra generación, 5ta generación, mantenimiento GNV, certificación GNV, taller GNV Sucre">
-    <title>Chankas Car - Taller GNV | Conversión y Mantenimiento</title>
+    <title>Chanka's Car - Taller GNV | Conversión y Mantenimiento</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
@@ -13,7 +13,7 @@
     <!-- Google Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <style>
         * {
@@ -490,13 +490,19 @@
             height: 50px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.1);
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-size: 1.5rem;
             transition: all 0.3s ease;
             text-decoration: none;
+            margin: 0 0.5rem;
+        }
+
+        .social-link i {
+            display: block;
+            line-height: 1;
         }
 
         .social-link:hover {
@@ -624,7 +630,7 @@
             <a href="/" class="logo">
                 <img src="{{ asset('vendor/adminlte/dist/img/fj.png') }}" alt="Chankas Car Logo">
                 <div class="logo-text">
-                    <h1>Chankas Car</h1>
+                    <h1>Chanka's Car</h1>
                     <p>Taller GNV</p>
                 </div>
             </a>
@@ -645,7 +651,7 @@
     <section class="hero">
         <div class="hero-content">
             <div class="hero-icon">🚗</div>
-            <h1 class="hero-title">Chankas Car</h1>
+            <h1 class="hero-title">Chanka's Car</h1>
             <p class="hero-subtitle">Taller GNV - Conversión y Mantenimiento Especializado</p>
             <div class="hero-buttons">
                 <a href="#servicios" class="btn btn-primary">
@@ -811,7 +817,7 @@
     <!-- FOOTER -->
     <footer class="footer">
         <div class="footer-content">
-            <p class="footer-text">© {{ date('Y') }} Chankas Car - Taller GNV. Todos los derechos reservados.</p>
+            <p class="footer-text">© {{ date('Y') }} Chanka's Car - Taller GNV. Todos los derechos reservados.</p>
             <a href="{{ route('login') }}" class="admin-access">
                 <i class="fas fa-lock"></i> Acceso Administrativo
             </a>
