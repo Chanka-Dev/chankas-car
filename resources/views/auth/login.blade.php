@@ -343,7 +343,7 @@
             <div class="login-footer">
                 <p>
                     <i class="fas fa-shield-alt"></i>
-                    Sistema Seguro © {{ date('Y') }} Chankas Car
+                    Safe System © {{ date('Y') }} Chanka's Development Team
                 </p>
             </div>
         </div>
