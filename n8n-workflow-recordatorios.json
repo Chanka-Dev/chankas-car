@@ -1,0 +1,122 @@
+{
+  "name": "WhatsApp Recordatorios GNV",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      },
+      "name": "Trigger Diario 9AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  t.id_trabajo,\n  t.fecha_trabajo,\n  t.fecha_recalificacion,\n  c.placas,\n  c.telefono\nFROM trabajos t\nINNER JOIN clientes c ON t.id_cliente = c.id_cliente\nWHERE c.telefono IS NOT NULL \n  AND c.telefono != ''\nORDER BY t.fecha_trabajo DESC"
+      },
+      "name": "Obtener Trabajos MySQL",
+      "type": "n8n-nodes-base.mysql",
+      "typeVersion": 2,
+      "position": [450, 300],
+      "credentials": {
+        "mysql": {
+          "id": "1",
+          "name": "MySQL Chankas Car"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const hoy = new Date();\nconst en5Dias = new Date(hoy);\nen5Dias.setDate(hoy.getDate() + 5);\nconst en3Dias = new Date(hoy);\nen3Dias.setDate(hoy.getDate() + 3);\n\nconst recordatorios = [];\n\nfor (const trabajo of items) {\n  const data = trabajo.json;\n  \n  // Determinar fecha objetivo\n  let fechaObjetivo;\n  let tipoRecordatorio;\n  \n  if (data.fecha_recalificacion) {\n    // Tiene recalificación - SOLO enviar para esa fecha\n    fechaObjetivo = new Date(data.fecha_recalificacion);\n    tipoRecordatorio = 'recalificacion';\n  } else {\n    // NO tiene recalificación - Revisión anual (fecha_trabajo + 1 año)\n    fechaObjetivo = new Date(data.fecha_trabajo);\n    fechaObjetivo.setFullYear(fechaObjetivo.getFullYear() + 1);\n    tipoRecordatorio = 'revision';\n  }\n  \n  // Verificar si hay que enviar recordatorio\n  const fechaObj = fechaObjetivo.toISOString().split('T')[0];\n  const fecha5 = en5Dias.toISOString().split('T')[0];\n  const fecha3 = en3Dias.toISOString().split('T')[0];\n  \n  if (fechaObj === fecha5) {\n    recordatorios.push({\n      json: {\n        telefono: data.telefono,\n        placa: data.placas,\n        fecha: fechaObjetivo.toLocaleDateString('es-BO'),\n        tipo: tipoRecordatorio,\n        diasAntes: 5\n      }\n    });\n  }\n  \n  if (fechaObj === fecha3) {\n    recordatorios.push({\n      json: {\n        telefono: data.telefono,\n        placa: data.placas,\n        fecha: fechaObjetivo.toLocaleDateString('es-BO'),\n        tipo: tipoRecordatorio,\n        diasAntes: 3\n      }\n    });\n  }\n}\n\nreturn recordatorios;"
+      },
+      "name": "Filtrar Fechas Próximas",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.tipo}}",
+              "operation": "equals",
+              "value2": "recalificacion"
+            }
+          ]
+        }
+      },
+      "name": "IF Tipo Mensaje",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const { telefono, placa, fecha, diasAntes } = $input.item.json;\n\nconst mensaje = `🔧 *Chankas Car - Recordatorio*\\n\\nEstimado cliente, le recordamos que su vehículo con placa *${placa}* tiene su *recalificación de cilindro GNV* programada para el *${fecha}*.\\n\\n⏰ Faltan ${diasAntes} días para la recalificación.\\n\\n⚠️ Es importante realizar este proceso en la fecha indicada.\\n📞 Para reprogramar o consultas, contáctenos.\\n📍 Chankas Car - Especialistas en GNV`;\n\nreturn {\n  json: {\n    telefono: telefono.replace(/^(\\+591)?/, '+591'),\n    mensaje: mensaje\n  }\n};"
+      },
+      "name": "Mensaje Recalificación",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "functionCode": "const { telefono, placa, fecha, diasAntes } = $input.item.json;\n\nconst mensaje = `🔧 *Chankas Car - Recordatorio*\\n\\nEstimado cliente, le recordamos que su vehículo con placa *${placa}* tiene su *revisión anual de habilitación GNV* programada para el *${fecha}*.\\n\\n⏰ Faltan ${diasAntes} días para su cita.\\n\\n📞 Para reprogramar o consultas, contáctenos.\\n📍 Chankas Car - Especialistas en GNV`;\n\nreturn {\n  json: {\n    telefono: telefono.replace(/^(\\+591)?/, '+591'),\n    mensaje: mensaje\n  }\n};"
+      },
+      "name": "Mensaje Revisión Anual",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1050, 400]
+    },
+    {
+      "parameters": {
+        "operation": "sendMessage",
+        "phoneNumberId": "={{$env.WHATSAPP_PHONE_NUMBER_ID}}",
+        "recipientPhoneNumber": "={{$json.telefono}}",
+        "message": "={{$json.mensaje}}"
+      },
+      "name": "Enviar WhatsApp",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [1250, 300],
+      "credentials": {
+        "whatsAppApi": {
+          "id": "2",
+          "name": "WhatsApp Business API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Trigger Diario 9AM": {
+      "main": [[{ "node": "Obtener Trabajos MySQL", "type": "main", "index": 0 }]]
+    },
+    "Obtener Trabajos MySQL": {
+      "main": [[{ "node": "Filtrar Fechas Próximas", "type": "main", "index": 0 }]]
+    },
+    "Filtrar Fechas Próximas": {
+      "main": [[{ "node": "IF Tipo Mensaje", "type": "main", "index": 0 }]]
+    },
+    "IF Tipo Mensaje": {
+      "main": [
+        [{ "node": "Mensaje Recalificación", "type": "main", "index": 0 }],
+        [{ "node": "Mensaje Revisión Anual", "type": "main", "index": 0 }]
+      ]
+    },
+    "Mensaje Recalificación": {
+      "main": [[{ "node": "Enviar WhatsApp", "type": "main", "index": 0 }]]
+    },
+    "Mensaje Revisión Anual": {
+      "main": [[{ "node": "Enviar WhatsApp", "type": "main", "index": 0 }]]
+    }
+  }
+}
