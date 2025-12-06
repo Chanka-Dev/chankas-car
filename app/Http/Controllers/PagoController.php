@@ -21,10 +21,7 @@ class PagoController extends Controller
      */
     public function index(Request $request)
     {
-        // Solo campos necesarios para el select
-        $empleados = Empleado::select('id_empleado', 'nombre', 'apellido')
-            ->orderBy('nombre')
-            ->get();
+        $empleados = Empleado::orderBy('nombre')->get();
         
         $trabajos = collect();
         $totalComision = 0;
@@ -42,25 +39,21 @@ class PagoController extends Controller
                 'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
             ]);
 
-            $empleadoSeleccionado = Empleado::select('id_empleado', 'nombre', 'apellido')
-                ->find($request->id_empleado);
+            $empleadoSeleccionado = Empleado::find($request->id_empleado);
             $fechaInicio = $request->fecha_inicio;
             $fechaFin = $request->fecha_fin;
 
-            // Obtener trabajos con solo campos necesarios
-            $trabajos = Trabajo::select('id_trabajo', 'fecha_trabajo', 'id_cliente', 'total_tecnico')
-                ->with([
-                    'cliente:id_cliente,placas',
-                    'trabajoServicios:id_trabajo_servicio,id_trabajo,id_servicio,importe_tecnico',
-                    'trabajoServicios.servicio:id_servicio,nombre'
-                ])
+            // Obtener trabajos del empleado en el rango de fechas
+            $trabajos = Trabajo::with(['cliente', 'trabajoServicios.servicio'])
                 ->where('id_empleado', $request->id_empleado)
                 ->whereBetween('fecha_trabajo', [$fechaInicio, $fechaFin])
                 ->orderBy('fecha_trabajo', 'asc')
                 ->get();
 
             // Calcular total de comisiones
-            $totalComision = $trabajos->sum('total_tecnico');
+            $totalComision = $trabajos->sum(function($trabajo) {
+                return $trabajo->total_tecnico;
+            });
 
             // Calcular total pagado en este período
             $totalPagado = PagoTecnico::where('id_empleado', $request->id_empleado)
@@ -248,10 +241,7 @@ class PagoController extends Controller
      */
     public function indexAgrupado(Request $request)
     {
-        // Solo campos necesarios
-        $empleados = Empleado::select('id_empleado', 'nombre', 'apellido')
-            ->orderBy('nombre')
-            ->get();
+        $empleados = Empleado::orderBy('nombre')->get();
         
         $trabajos = collect();
         $totalComision = 0;
@@ -270,18 +260,12 @@ class PagoController extends Controller
                 'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
             ]);
 
-            $empleadoSeleccionado = Empleado::select('id_empleado', 'nombre', 'apellido')
-                ->find($request->id_empleado);
+            $empleadoSeleccionado = Empleado::find($request->id_empleado);
             $fechaInicio = $request->fecha_inicio;
             $fechaFin = $request->fecha_fin;
 
-            // Obtener trabajos con campos específicos
-            $trabajos = Trabajo::select('id_trabajo', 'fecha_trabajo', 'id_cliente', 'total_tecnico')
-                ->with([
-                    'cliente:id_cliente,placas',
-                    'trabajoServicios:id_trabajo_servicio,id_trabajo,id_servicio,importe_tecnico',
-                    'trabajoServicios.servicio:id_servicio,nombre'
-                ])
+            // Obtener trabajos del empleado en el rango de fechas
+            $trabajos = Trabajo::with(['cliente', 'trabajoServicios.servicio'])
                 ->where('id_empleado', $request->id_empleado)
                 ->whereBetween('fecha_trabajo', [$fechaInicio, $fechaFin])
                 ->orderBy('fecha_trabajo', 'asc')

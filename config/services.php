@@ -36,4 +36,9 @@ return [
         'secret_key' => env('RECAPTCHA_SECRET_KEY'),
     ],
 
+    'whatsapp' => [
+        'api_url' => env('WHATSAPP_API_URL', 'http://localhost:5678/webhook/whatsapp'),
+        'api_key' => env('WHATSAPP_API_KEY', ''),
+    ],
+
 ];

@@ -12,7 +12,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Enviar recordatorios de revisiones y recalificaciones
+        // Se ejecuta todos los días a las 9:00 AM
+        $schedule->command('recordatorios:revisiones')
+                 ->dailyAt('09:00')
+                 ->timezone('America/La_Paz')
+                 ->appendOutputTo(storage_path('logs/recordatorios.log'));
     }
 
     /**

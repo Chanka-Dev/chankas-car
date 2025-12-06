@@ -33,12 +33,14 @@ class DashboardController extends Controller
                 ->whereYear('fecha_trabajo', date('Y'))
                 ->count();
 
-            // Ingresos y comisiones del mes con una sola query optimizada
-            $totalesMes = Trabajo::whereMonth('fecha_trabajo', date('m'))
-                ->whereYear('fecha_trabajo', date('Y'))
+            // Ingresos y comisiones del mes - ahora desde trabajo_servicios
+            $totalesMes = DB::table('trabajo_servicios')
+                ->join('trabajos', 'trabajo_servicios.id_trabajo', '=', 'trabajos.id_trabajo')
+                ->whereMonth('trabajos.fecha_trabajo', date('m'))
+                ->whereYear('trabajos.fecha_trabajo', date('Y'))
                 ->selectRaw('
-                    SUM(total_cliente) as ingresos_total,
-                    SUM(total_tecnico) as comisiones_total
+                    SUM(trabajo_servicios.importe_cliente) as ingresos_total,
+                    SUM(trabajo_servicios.importe_tecnico) as comisiones_total
                 ')
                 ->first();
 
@@ -58,7 +60,7 @@ class DashboardController extends Controller
 
         // Sin caché: últimos trabajos (siempre actualizados)
         $ultimosTrabajos = Trabajo::with(['empleado:id_empleado,nombre,apellido', 'cliente:id_cliente,placas'])
-            ->select('id_trabajo', 'fecha_trabajo', 'id_empleado', 'id_cliente', 'total_cliente', 'total_tecnico')
+            ->select('id_trabajo', 'fecha_trabajo', 'id_empleado', 'id_cliente')
             ->orderBy('fecha_trabajo', 'desc')
             ->limit(10)
             ->get();
