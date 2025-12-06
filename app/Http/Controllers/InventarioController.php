@@ -15,13 +15,17 @@ class InventarioController extends Controller
 
     public function index()
     {
-        $inventarios = Inventario::with('proveedor')->get();
+        $inventarios = Inventario::with('proveedor')
+            ->orderBy('nombre')
+            ->get();
         return view('inventarios.index', compact('inventarios'));
     }
 
     public function create()
     {
-        $proveedores = Proveedor::orderBy('nombre')->get();
+        $proveedores = Proveedor::select('id_proveedor', 'nombre')
+            ->orderBy('nombre')
+            ->get();
         return view('inventarios.create', compact('proveedores'));
     }
 
@@ -71,7 +75,9 @@ class InventarioController extends Controller
 
     public function edit(Inventario $inventario)
     {
-        $proveedores = Proveedor::orderBy('nombre')->get();
+        $proveedores = Proveedor::select('id_proveedor', 'nombre')
+            ->orderBy('nombre')
+            ->get();
         return view('inventarios.edit', compact('inventario', 'proveedores'));
     }
 

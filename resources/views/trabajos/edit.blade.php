@@ -268,6 +268,7 @@
 @stop
 
 @section('js')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     $(document).ready(function() {
         let servicioIndex = 0;
@@ -334,6 +335,7 @@
                 placeholder: 'Buscar servicio...',
                 allowClear: true,
                 width: '100%',
+                minimumResultsForSearch: 0,
                 language: {
                     noResults: function() {
                         return "No se encontraron resultados";
@@ -422,6 +424,7 @@
                 placeholder: 'Buscar servicio...',
                 allowClear: true,
                 width: '100%',
+                minimumResultsForSearch: 0,
                 language: {
                     noResults: function() {
                         return "No se encontraron resultados";
@@ -445,6 +448,8 @@
 @stop
 
 @section('css')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css" rel="stylesheet" />
     @vite('resources/css/adminlte-theme.css')
     <style>
         /* Estilos mejorados para Select2 - apariencia de desplegable */

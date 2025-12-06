@@ -14,7 +14,9 @@ class ProveedorController extends Controller
 
     public function index()
     {
-        $proveedores = Proveedor::withCount('inventarios')->get();
+        $proveedores = Proveedor::withCount('inventarios')
+            ->orderBy('nombre')
+            ->get();
         return view('proveedores.index', compact('proveedores'));
     }
 

@@ -59,10 +59,13 @@ class GastoTallerController extends Controller
 
     public function create()
     {
-        $empleados = Empleado::orderBy('nombre')->get();
+        // Solo campos necesarios para el select
+        $empleados = Empleado::select('id_empleado', 'nombre', 'apellido')
+            ->orderBy('nombre')
+            ->get();
         $empleadoActual = auth()->user()->id_empleado;
         
-        // Obtener conceptos únicos de gastos existentes
+        // Obtener conceptos únicos de gastos existentes (ya optimizado)
         $conceptos = GastoTaller::select('concepto')
             ->distinct()
             ->orderBy('concepto')
@@ -95,10 +98,13 @@ class GastoTallerController extends Controller
 
     public function edit(GastoTaller $gasto)
     {
-        $empleados = Empleado::orderBy('nombre')->get();
+        // Solo campos necesarios
+        $empleados = Empleado::select('id_empleado', 'nombre', 'apellido')
+            ->orderBy('nombre')
+            ->get();
         $empleadoActual = auth()->user()->id_empleado;
         
-        // Obtener conceptos únicos de gastos existentes
+        // Obtener conceptos únicos de gastos existentes (ya optimizado)
         $conceptos = GastoTaller::select('concepto')
             ->distinct()
             ->orderBy('concepto')

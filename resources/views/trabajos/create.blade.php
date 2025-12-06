@@ -357,6 +357,7 @@
 @stop
 
 @section('js')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     $(document).ready(function() {
         let servicioIndex = 0;
@@ -378,6 +379,7 @@
                 placeholder: 'Buscar servicio...',
                 allowClear: true,
                 width: '100%',
+                minimumResultsForSearch: 0,
                 language: {
                     noResults: function() {
                         return "No se encontraron resultados";
@@ -468,9 +470,10 @@
             let newPiezaSelect = $('#piezas-trabajo-container .pieza-trabajo-item').last().find('.pieza-trabajo-select');
             newPiezaSelect.select2({
                 theme: 'bootstrap4',
-                placeholder: 'Seleccione una pieza...',
+                placeholder: 'Buscar pieza...',
                 allowClear: true,
                 width: '100%',
+                minimumResultsForSearch: 0,
                 language: {
                     noResults: function() {
                         return "No se encontraron piezas";
@@ -566,9 +569,10 @@
                             let piezaSelect = card.find('.pieza-trabajo-select');
                             piezaSelect.select2({
                                 theme: 'bootstrap4',
-                                placeholder: 'Seleccione una pieza...',
+                                placeholder: 'Buscar pieza...',
                                 allowClear: true,
                                 width: '100%',
+                                minimumResultsForSearch: 0,
                                 language: {
                                     noResults: function() {
                                         return "No se encontraron piezas";
@@ -652,22 +656,27 @@
 @stop
 
 @section('css')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css" rel="stylesheet" />
     @vite('resources/css/adminlte-theme.css')
     <style>
         /* Estilos mejorados para Select2 - apariencia de desplegable */
         .select2-container--bootstrap4 .select2-selection--single {
             height: calc(2.25rem + 2px) !important;
-            border: 1px solid #ced4da;
+            border: 1.5px solid #ced4da;
             border-radius: 0.25rem;
             padding: 0.375rem 0.75rem;
             background-color: #fff;
             cursor: pointer;
+            transition: all 0.2s ease-in-out;
         }
         
         .select2-container--bootstrap4 .select2-selection--single .select2-selection__rendered {
             line-height: calc(2.25rem) !important;
             padding-left: 0;
-            color: #495057;
+            color: #2c3e50;
+            font-weight: 500;
+            font-size: 14px;
         }
         
         .select2-container--bootstrap4 .select2-selection--single .select2-selection__arrow {
@@ -679,7 +688,7 @@
         }
         
         .select2-container--bootstrap4 .select2-selection--single .select2-selection__arrow b {
-            border-color: #495057 transparent transparent transparent;
+            border-color: #2c3e50 transparent transparent transparent;
             border-style: solid;
             border-width: 5px 4px 0 4px;
             height: 0;
@@ -693,14 +702,25 @@
         
         /* Estado hover */
         .select2-container--bootstrap4 .select2-selection--single:hover {
-            border-color: #80bdff;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            border-color: #007bff;
+            background-color: #f8f9fa;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
+        }
+        
+        .select2-container--bootstrap4 .select2-selection--single:hover .select2-selection__rendered {
+            color: #007bff;
+        }
+        
+        .select2-container--bootstrap4 .select2-selection--single:hover .select2-selection__arrow b {
+            border-color: #007bff transparent transparent transparent;
         }
         
         /* Estado focus */
-        .select2-container--bootstrap4.select2-container--focus .select2-selection--single {
-            border-color: #80bdff;
+        .select2-container--bootstrap4.select2-container--focus .select2-selection--single,
+        .select2-container--bootstrap4.select2-container--open .select2-selection--single {
+            border-color: #007bff;
             outline: 0;
+            background-color: #f8f9fa;
             box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
         }
         
@@ -708,6 +728,45 @@
         .select2-container--bootstrap4 .select2-selection--single .select2-selection__placeholder {
             color: #6c757d;
             font-style: italic;
+            font-weight: 400;
+        }
+        
+        /* Dropdown mejorado */
+        .select2-container--bootstrap4 .select2-dropdown {
+            border: 1.5px solid #007bff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .select2-container--bootstrap4 .select2-results__option {
+            color: #2c3e50;
+            font-weight: 500;
+            padding: 8px 12px;
+        }
+        
+        .select2-container--bootstrap4 .select2-results__option:hover,
+        .select2-container--bootstrap4 .select2-results__option--highlighted {
+            background-color: #007bff !important;
+            color: white !important;
+        }
+        
+        .select2-container--bootstrap4 .select2-results__option[aria-selected="true"] {
+            background-color: #e7f3ff;
+            color: #007bff;
+        }
+        
+        /* Búsqueda en dropdown */
+        .select2-container--bootstrap4 .select2-search--dropdown .select2-search__field {
+            border: 1.5px solid #ced4da;
+            border-radius: 0.25rem;
+            padding: 6px 12px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .select2-container--bootstrap4 .select2-search--dropdown .select2-search__field:focus {
+            border-color: #007bff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
         }
     </style>
 @stop

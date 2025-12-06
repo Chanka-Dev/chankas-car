@@ -235,12 +235,25 @@
             border-radius: 8px;
             margin-bottom: 20px;
             font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert i {
+            font-size: 18px;
         }
 
         .alert-danger {
             background: #fee;
             color: #c33;
             border: 1px solid #fcc;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffc107;
         }
 
         /* Loading animation */
@@ -286,8 +299,9 @@
 
             <div class="login-body">
                 @if (session('error'))
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-clock"></i>
+                        <span>{{ session('error') }}</span>
                     </div>
                 @endif
 

@@ -12,6 +12,12 @@ class Authenticate extends Middleware
      */
     protected function redirectTo(Request $request): ?string
     {
-        return $request->expectsJson() ? null : route('panel.login');
+        if (!$request->expectsJson()) {
+            // Agregar mensaje flash cuando la sesión ha expirado
+            session()->flash('error', 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+            return route('login');
+        }
+        
+        return null;
     }
 }

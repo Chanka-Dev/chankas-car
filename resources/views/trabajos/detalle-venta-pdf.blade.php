@@ -229,7 +229,7 @@
     <div class="footer">
         <p><strong>CHANKAS CAR - GNV</strong></p>
         <p>Conversiones a gas natural vehicular y habilitaciones</p>
-        <p>WhatsApp: 74106444 | Cochabamba - Bolivia</p>
+        <p>WhatsApp: 74106444 | Sucre - Bolivia</p>
         <p style="margin-top: 10px; font-size: 9px;">
             Documento generado el {{ now()->format('d/m/Y H:i') }}
         </p>

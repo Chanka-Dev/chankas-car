@@ -14,11 +14,17 @@ class ServicioController extends Controller
         $this->middleware('role:admin')->except(['index', 'show', 'getPiezas']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $servicios = Servicio::withCount('trabajoServicios')
-            ->orderBy('nombre')
-            ->get();
+        $query = Servicio::withCount('trabajoServicios');
+
+        // Filtro por búsqueda (nombre)
+        if ($request->has('buscar') && $request->buscar) {
+            $query->where('nombre', 'like', '%' . $request->buscar . '%');
+        }
+
+        $servicios = $query->orderBy('nombre')->paginate(20)->withQueryString();
+        
         return view('servicios.index', compact('servicios'));
     }
 

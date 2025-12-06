@@ -214,6 +214,7 @@
                 tags: true,
                 placeholder: "Selecciona un concepto o escribe uno nuevo...",
                 allowClear: true,
+                minimumResultsForSearch: 0,
                 language: {
                     noResults: function() {
                         return "No se encontró el concepto. Escribe para crear uno nuevo.";

@@ -71,16 +71,26 @@ class TrabajoController extends Controller
         // Paginar en lugar de get()
         $trabajos = $query->paginate(50)->withQueryString();
         
-        // Obtener empleados para el filtro
-        $empleados = \App\Models\Empleado::orderBy('nombre')->get();
+        // Obtener empleados para el filtro (solo campos necesarios)
+        $empleados = Empleado::select('id_empleado', 'nombre', 'apellido')
+            ->orderBy('nombre')
+            ->get();
         
         return view('trabajos.index', compact('trabajos', 'empleados'));
     }
 
     public function create()
     {
-        $servicios = Servicio::orderBy('nombre')->get();
-        $empleados = Empleado::with('cargo')->get();
+        // Solo campos necesarios para los selects
+        $servicios = Servicio::select('id_servicio', 'nombre', 'costo', 'comision')
+            ->orderBy('nombre')
+            ->get();
+        
+        $empleados = Empleado::select('id_empleado', 'nombre', 'apellido', 'id_cargo')
+            ->with('cargo:id_cargo,nombre')
+            ->orderBy('nombre')
+            ->get();
+        
         return view('trabajos.create', compact('servicios', 'empleados'));
     }
 
@@ -359,9 +369,22 @@ public function update(Request $request, Trabajo $trabajo)
 
     public function edit(Trabajo $trabajo)
     {
-        $servicios = Servicio::orderBy('nombre')->get();
-        $empleados = Empleado::with('cargo')->get();
-        $trabajo->load(['trabajoServicios.servicio']);
+        // Solo campos necesarios
+        $servicios = Servicio::select('id_servicio', 'nombre', 'costo', 'comision')
+            ->orderBy('nombre')
+            ->get();
+        
+        $empleados = Empleado::select('id_empleado', 'nombre', 'apellido', 'id_cargo')
+            ->with('cargo:id_cargo,nombre')
+            ->orderBy('nombre')
+            ->get();
+        
+        // Cargar solo relaciones necesarias con campos específicos
+        $trabajo->load([
+            'trabajoServicios.servicio:id_servicio,nombre,costo,comision',
+            'trabajoInventarios.inventario:id_inventario,nombre,unidad_medida'
+        ]);
+        
         return view('trabajos.edit', compact('trabajo', 'servicios', 'empleados'));
     }
 
