@@ -50,6 +50,19 @@
         </script>
     @endif
     
+    @if(session('warning'))
+        <script>
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atención',
+                html: `{!! str_replace(["\n", "\r"], '<br>', session('warning')) !!}`,
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#f39c12',
+                width: '600px',
+            });
+        </script>
+    @endif
+    
     @if(session('info'))
         <script>
             mostrarInfo("Información", "{{ session('info') }}");

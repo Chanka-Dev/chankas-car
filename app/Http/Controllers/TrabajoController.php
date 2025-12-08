@@ -9,6 +9,7 @@ use App\Models\Cliente;
 use App\Models\TrabajoServicio;
 use App\Models\TrabajoInventario;
 use App\Models\Inventario;
+use App\Models\PagoTecnico;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -210,6 +211,15 @@ public function store(Request $request)
 
         DB::commit();
 
+        // VERIFICAR SI SE ESTÁ AÑADIENDO UN TRABAJO EN UN PERÍODO YA SALDADO
+        $alerta = $this->verificarPeriodoSaldado($trabajo);
+
+        if ($alerta) {
+            return redirect()->route('trabajos.index')
+                ->with('warning', $alerta)
+                ->with('success', 'Trabajo registrado exitosamente.');
+        }
+
         return redirect()->route('trabajos.index')
             ->with('success', 'Trabajo registrado exitosamente.');
     } catch (\Exception $e) {
@@ -351,6 +361,15 @@ public function update(Request $request, Trabajo $trabajo)
 
         DB::commit();
 
+        // VERIFICAR SI SE ESTÁ ACTUALIZANDO UN TRABAJO EN UN PERÍODO YA SALDADO
+        $alerta = $this->verificarPeriodoSaldado($trabajo);
+
+        if ($alerta) {
+            return redirect()->route('trabajos.index')
+                ->with('warning', $alerta)
+                ->with('success', 'Trabajo actualizado exitosamente.');
+        }
+
         return redirect()->route('trabajos.index')
             ->with('success', 'Trabajo actualizado exitosamente.');
     } catch (\Exception $e) {
@@ -442,5 +461,53 @@ public function update(Request $request, Trabajo $trabajo)
             ->paginate(30);
         
         return view('trabajos.mis-trabajos', compact('trabajos'));
+    }
+
+    /**
+     * Verificar si se está añadiendo un trabajo en un período ya saldado
+     */
+    private function verificarPeriodoSaldado(Trabajo $trabajo)
+    {
+        // Buscar pagos que incluyan la fecha de este trabajo
+        $pagosSaldados = PagoTecnico::where('id_empleado', $trabajo->id_empleado)
+            ->where('periodo_inicio', '<=', $trabajo->fecha_trabajo)
+            ->where('periodo_fin', '>=', $trabajo->fecha_trabajo)
+            ->orderBy('fecha_pago', 'desc')
+            ->get();
+
+        if ($pagosSaldados->isEmpty()) {
+            return null; // No hay pagos, todo normal
+        }
+
+        // Calcular el total de comisiones de este trabajo
+        $comisionTrabajo = $trabajo->trabajoServicios->sum('importe_tecnico');
+
+        // Construir mensaje de alerta
+        $empleado = $trabajo->empleado;
+        $mensajes = [];
+
+        foreach ($pagosSaldados as $pago) {
+            $mensajes[] = sprintf(
+                "• Pago de Bs %.2f realizado el %s (período %s al %s)",
+                $pago->monto_pagado,
+                $pago->fecha_pago->format('d/m/Y'),
+                $pago->periodo_inicio->format('d/m/Y'),
+                $pago->periodo_fin->format('d/m/Y')
+            );
+        }
+
+        $alerta = sprintf(
+            "⚠️ ATENCIÓN: Este trabajo del %s genera Bs %.2f de comisión para %s %s en un período YA SALDADO.\n\n" .
+            "Pagos realizados que cubren este período:\n%s\n\n" .
+            "IMPACTO: Este técnico ahora tendrá un nuevo saldo pendiente de Bs %.2f que deberá ser pagado por separado.",
+            $trabajo->fecha_trabajo->format('d/m/Y'),
+            $comisionTrabajo,
+            $empleado->nombre,
+            $empleado->apellido,
+            implode("\n", $mensajes),
+            $comisionTrabajo
+        );
+
+        return $alerta;
     }
 }
