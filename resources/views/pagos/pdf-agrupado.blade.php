@@ -151,16 +151,8 @@
 
     <div class="resumen-box">
         <div class="resumen-row">
-            <span>Comisiones:</span>
+            <span>Total Comisiones del Período:</span>
             <span><strong>Bs {{ number_format($totalComision, 2) }}</strong></span>
-        </div>
-        <div class="resumen-row">
-            <span>Pagado:</span>
-            <span><strong>Bs {{ number_format($totalPagado, 2) }}</strong></span>
-        </div>
-        <div class="resumen-row" style="color: {{ $saldoPendiente > 0 ? '#cc0000' : '#28a745' }}; font-weight: bold;">
-            <span>Saldo:</span>
-            <span><strong>Bs {{ number_format($saldoPendiente, 2) }}</strong></span>
         </div>
     </div>
 
@@ -212,14 +204,8 @@
     @endforeach
 
     <div class="total-final">
-        TOTAL A PAGAR: Bs {{ number_format($totalComision, 2) }}
+        TOTAL COMISIONES DEL PERÍODO: Bs {{ number_format($totalComision, 2) }}
     </div>
-
-    @if($saldoPendiente > 0)
-        <div class="saldo-pendiente">
-            SALDO PENDIENTE: Bs {{ number_format($saldoPendiente, 2) }}
-        </div>
-    @endif
 
     <div style="margin-top: 6px; text-align: center; font-size: 6px; color: #666;">
         Documento generado el {{ \Carbon\Carbon::now()->format('d/m/Y H:i') }} - Chankas Car

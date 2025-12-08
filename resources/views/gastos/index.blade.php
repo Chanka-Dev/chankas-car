@@ -9,6 +9,34 @@
 @section('content')
     <div class="card">
         <div class="card-header">
+            <h3 class="card-title">Filtros de Búsqueda</h3>
+        </div>
+        <div class="card-body">
+            <form action="{{ route('gastos.index') }}" method="GET" class="form-inline">
+                <div class="form-group mr-2 mb-2">
+                    <label for="fecha_desde" class="mr-2">Desde:</label>
+                    <input type="date" name="fecha_desde" id="fecha_desde" class="form-control" value="{{ request('fecha_desde') }}">
+                </div>
+                <div class="form-group mr-2 mb-2">
+                    <label for="fecha_hasta" class="mr-2">Hasta:</label>
+                    <input type="date" name="fecha_hasta" id="fecha_hasta" class="form-control" value="{{ request('fecha_hasta') }}">
+                </div>
+                <div class="form-group mr-2 mb-2">
+                    <label for="concepto" class="mr-2">Concepto:</label>
+                    <input type="text" name="concepto" id="concepto" class="form-control" placeholder="Buscar..." value="{{ request('concepto') }}">
+                </div>
+                <button type="submit" class="btn btn-primary mr-2 mb-2">
+                    <i class="fas fa-search"></i> Filtrar
+                </button>
+                <a href="{{ route('gastos.index') }}" class="btn btn-secondary mb-2">
+                    <i class="fas fa-times"></i> Limpiar
+                </a>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
             <h3 class="card-title">Lista de Gastos</h3>
             <div class="card-tools">
                 @canManage

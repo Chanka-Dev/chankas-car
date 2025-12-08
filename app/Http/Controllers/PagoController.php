@@ -24,9 +24,11 @@ class PagoController extends Controller
         $empleados = Empleado::orderBy('nombre')->get();
         
         $trabajos = collect();
-        $totalComision = 0;
-        $totalPagado = 0;
+        $comisionesPeriodo = 0;
+        $pagosPeriodo = 0;
         $saldoPendiente = 0;
+        $saldoAnterior = 0;
+        $saldoFinal = 0;
         $empleadoSeleccionado = null;
         $fechaInicio = null;
         $fechaFin = null;
@@ -43,27 +45,38 @@ class PagoController extends Controller
             $fechaInicio = $request->fecha_inicio;
             $fechaFin = $request->fecha_fin;
 
-            // Obtener trabajos del empleado en el rango de fechas
+            // 1. SALDO ANTERIOR (Todo lo que pasó ANTES del período)
+            $comisionesAnteriores = DB::table('trabajo_servicios')
+                ->join('trabajos', 'trabajo_servicios.id_trabajo', '=', 'trabajos.id_trabajo')
+                ->where('trabajos.id_empleado', $request->id_empleado)
+                ->where('trabajos.fecha_trabajo', '<', $fechaInicio)
+                ->sum('trabajo_servicios.importe_tecnico');
+
+            $pagosAnteriores = PagoTecnico::where('id_empleado', $request->id_empleado)
+                ->where('fecha_pago', '<', $fechaInicio)
+                ->sum('monto_pagado');
+
+            $saldoAnterior = $comisionesAnteriores - $pagosAnteriores;
+
+            // 2. COMISIONES DEL PERÍODO (trabajo realizado en este rango)
             $trabajos = Trabajo::with(['cliente', 'trabajoServicios.servicio'])
                 ->where('id_empleado', $request->id_empleado)
                 ->whereBetween('fecha_trabajo', [$fechaInicio, $fechaFin])
                 ->orderBy('fecha_trabajo', 'asc')
                 ->get();
 
-            // Calcular total de comisiones
-            $totalComision = $trabajos->sum(function($trabajo) {
+            $comisionesPeriodo = $trabajos->sum(function($trabajo) {
                 return $trabajo->total_tecnico;
             });
 
-            // Calcular total pagado en este período
-            $totalPagado = PagoTecnico::where('id_empleado', $request->id_empleado)
-                ->where(function($query) use ($fechaInicio, $fechaFin) {
-                    $query->whereBetween('periodo_inicio', [$fechaInicio, $fechaFin])
-                          ->orWhereBetween('periodo_fin', [$fechaInicio, $fechaFin]);
-                })
+            // 3. PAGOS DEL PERÍODO (dinero entregado en este rango)
+            $pagosPeriodo = PagoTecnico::where('id_empleado', $request->id_empleado)
+                ->whereBetween('fecha_pago', [$fechaInicio, $fechaFin])
                 ->sum('monto_pagado');
 
-            $saldoPendiente = $totalComision - $totalPagado;
+            // 4. SALDO FINAL
+            // Saldo Final = Saldo que traía + Lo que trabajó - Lo que se le pagó
+            $saldoFinal = $saldoAnterior + $comisionesPeriodo - $pagosPeriodo;
         }
 
         // Obtener todos los saldos pendientes (para todos los empleados)
@@ -83,9 +96,10 @@ class PagoController extends Controller
         return view('pagos.index', compact(
             'empleados',
             'trabajos',
-            'totalComision',
-            'totalPagado',
-            'saldoPendiente',
+            'comisionesPeriodo',
+            'pagosPeriodo',
+            'saldoAnterior',
+            'saldoFinal',
             'empleadoSeleccionado',
             'fechaInicio',
             'fechaFin',
@@ -244,9 +258,10 @@ class PagoController extends Controller
         $empleados = Empleado::orderBy('nombre')->get();
         
         $trabajos = collect();
-        $totalComision = 0;
-        $totalPagado = 0;
-        $saldoPendiente = 0;
+        $comisionesPeriodo = 0;
+        $pagosPeriodo = 0;
+        $saldoAnterior = 0;
+        $saldoFinal = 0;
         $empleadoSeleccionado = null;
         $fechaInicio = null;
         $fechaFin = null;
@@ -264,7 +279,20 @@ class PagoController extends Controller
             $fechaInicio = $request->fecha_inicio;
             $fechaFin = $request->fecha_fin;
 
-            // Obtener trabajos del empleado en el rango de fechas
+            // 1. SALDO ANTERIOR
+            $comisionesAnteriores = DB::table('trabajo_servicios')
+                ->join('trabajos', 'trabajo_servicios.id_trabajo', '=', 'trabajos.id_trabajo')
+                ->where('trabajos.id_empleado', $request->id_empleado)
+                ->where('trabajos.fecha_trabajo', '<', $fechaInicio)
+                ->sum('trabajo_servicios.importe_tecnico');
+
+            $pagosAnteriores = PagoTecnico::where('id_empleado', $request->id_empleado)
+                ->where('fecha_pago', '<', $fechaInicio)
+                ->sum('monto_pagado');
+
+            $saldoAnterior = $comisionesAnteriores - $pagosAnteriores;
+
+            // 2. TRABAJOS DEL PERÍODO
             $trabajos = Trabajo::with(['cliente', 'trabajoServicios.servicio'])
                 ->where('id_empleado', $request->id_empleado)
                 ->whereBetween('fecha_trabajo', [$fechaInicio, $fechaFin])
@@ -298,20 +326,18 @@ class PagoController extends Controller
                 $serviciosPorFecha[$fecha] = $serviciosAgrupados;
             }
 
-            // Calcular total de comisiones
-            $totalComision = $trabajos->sum(function($trabajo) {
+            // 3. COMISIONES DEL PERÍODO
+            $comisionesPeriodo = $trabajos->sum(function($trabajo) {
                 return $trabajo->total_tecnico;
             });
 
-            // Calcular total pagado en este período
-            $totalPagado = PagoTecnico::where('id_empleado', $request->id_empleado)
-                ->where(function($query) use ($fechaInicio, $fechaFin) {
-                    $query->whereBetween('periodo_inicio', [$fechaInicio, $fechaFin])
-                          ->orWhereBetween('periodo_fin', [$fechaInicio, $fechaFin]);
-                })
+            // 4. PAGOS DEL PERÍODO
+            $pagosPeriodo = PagoTecnico::where('id_empleado', $request->id_empleado)
+                ->whereBetween('fecha_pago', [$fechaInicio, $fechaFin])
                 ->sum('monto_pagado');
 
-            $saldoPendiente = $totalComision - $totalPagado;
+            // 5. SALDO FINAL
+            $saldoFinal = $saldoAnterior + $comisionesPeriodo - $pagosPeriodo;
         }
 
         // Obtener todos los saldos pendientes
@@ -332,9 +358,10 @@ class PagoController extends Controller
             'empleados',
             'trabajos',
             'serviciosPorFecha',
-            'totalComision',
-            'totalPagado',
-            'saldoPendiente',
+            'comisionesPeriodo',
+            'pagosPeriodo',
+            'saldoFinal',
+            'saldoAnterior',
             'empleadoSeleccionado',
             'fechaInicio',
             'fechaFin',
@@ -396,23 +423,13 @@ class PagoController extends Controller
             return $trabajo->total_tecnico;
         });
 
-        // Obtener total pagado
-        $totalPagado = PagoTecnico::where('id_empleado', $request->id_empleado)
-            ->whereBetween('periodo_inicio', [$fechaInicio, $fechaFin])
-            ->orWhereBetween('periodo_fin', [$fechaInicio, $fechaFin])
-            ->sum('monto_pagado');
-
-        $saldoPendiente = $totalComision - $totalPagado;
-
         // Generar PDF
         $pdf = Pdf::loadView('pagos.pdf-agrupado', compact(
             'empleado',
             'fechaInicio',
             'fechaFin',
             'serviciosPorFecha',
-            'totalComision',
-            'totalPagado',
-            'saldoPendiente'
+            'totalComision'
         ));
 
         $nombreArchivo = 'pago_agrupado_' . $empleado->nombre . '_' . $empleado->apellido . '_' . date('Y-m-d') . '.pdf';

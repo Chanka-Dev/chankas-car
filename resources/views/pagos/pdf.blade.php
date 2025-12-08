@@ -168,7 +168,7 @@
     </table>
 
     <div class="total-final">
-        TOTAL A PAGAR: Bs {{ number_format($totalComision, 2) }}
+        TOTAL COMISIONES DEL PERÍODO: Bs {{ number_format($totalComision, 2) }}
     </div>
 
     <div style="margin-top: 8px; text-align: center; font-size: 6px; color: #666;">

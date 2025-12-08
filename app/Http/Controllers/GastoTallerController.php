@@ -13,11 +13,26 @@ class GastoTallerController extends Controller
         $this->middleware('role:admin,cajero');
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        // Inicializar query para gastos del taller
+        $queryGastos = GastoTaller::with('empleado');
+        
+        // Aplicar filtros
+        if ($request->filled('fecha_desde')) {
+            $queryGastos->where('fecha', '>=', $request->fecha_desde);
+        }
+        
+        if ($request->filled('fecha_hasta')) {
+            $queryGastos->where('fecha', '<=', $request->fecha_hasta);
+        }
+        
+        if ($request->filled('concepto')) {
+            $queryGastos->where('concepto', 'like', '%' . $request->concepto . '%');
+        }
+        
         // Obtener gastos del taller
-        $gastosTaller = GastoTaller::with('empleado')
-            ->get()
+        $gastosTaller = $queryGastos->get()
             ->map(function($gasto) {
                 return [
                     'id' => $gasto->id_gasto,
@@ -32,9 +47,20 @@ class GastoTallerController extends Controller
                 ];
             });
 
+        // Inicializar query para pagos a técnicos
+        $queryPagos = \App\Models\PagoTecnico::with('empleado');
+        
+        // Aplicar filtros a pagos
+        if ($request->filled('fecha_desde')) {
+            $queryPagos->where('fecha_pago', '>=', $request->fecha_desde);
+        }
+        
+        if ($request->filled('fecha_hasta')) {
+            $queryPagos->where('fecha_pago', '<=', $request->fecha_hasta);
+        }
+
         // Obtener pagos a técnicos
-        $pagosTecnicos = \App\Models\PagoTecnico::with('empleado')
-            ->get()
+        $pagosTecnicos = $queryPagos->get()
             ->map(function($pago) {
                 return [
                     'id' => $pago->id_pago,

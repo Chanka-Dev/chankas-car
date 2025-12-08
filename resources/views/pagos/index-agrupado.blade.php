@@ -123,30 +123,47 @@
             </div>
             <div class="card-body">
                 <div class="row mb-3">
-                    <div class="col-md-4">
+                    @if($empleadoSeleccionado)
+                        @if($saldoAnterior != 0)
+                        <div class="col-md-3">
+                            <div class="info-box {{ $saldoAnterior > 0 ? 'bg-warning' : 'bg-success' }}">
+                                <span class="info-box-icon"><i class="fas fa-history"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Saldo Anterior</span>
+                                    <span class="info-box-number">Bs {{ number_format($saldoAnterior, 2) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+                    @endif
+                    
+                    <div class="{{ $empleadoSeleccionado && $saldoAnterior != 0 ? 'col-md-3' : 'col-md-4' }}">
                         <div class="info-box bg-info">
                             <span class="info-box-icon"><i class="fas fa-calculator"></i></span>
                             <div class="info-box-content">
-                                <span class="info-box-text">Total Comisiones Generadas</span>
-                                <span class="info-box-number">Bs {{ number_format($totalComision, 2) }}</span>
+                                <span class="info-box-text">🔧 Comisiones Trabajadas</span>
+                                <span class="info-box-number">Bs {{ number_format($comisionesPeriodo, 2) }}</span>
+                                <span class="progress-description">{{ $empleadoSeleccionado ? 'En este período' : 'Total histórico' }}</span>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="{{ $empleadoSeleccionado && $saldoAnterior != 0 ? 'col-md-3' : 'col-md-4' }}">
                         <div class="info-box bg-success">
                             <span class="info-box-icon"><i class="fas fa-check"></i></span>
                             <div class="info-box-content">
-                                <span class="info-box-text">Total Pagado</span>
-                                <span class="info-box-number">Bs {{ number_format($totalPagado, 2) }}</span>
+                                <span class="info-box-text">💵 Dinero Entregado</span>
+                                <span class="info-box-number">Bs {{ number_format($pagosPeriodo, 2) }}</span>
+                                <span class="progress-description">{{ $empleadoSeleccionado ? 'En este período' : 'Total histórico' }}</span>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="info-box {{ $saldoPendiente > 0 ? 'bg-warning' : 'bg-secondary' }}">
+                    <div class="{{ $empleadoSeleccionado && $saldoAnterior != 0 ? 'col-md-3' : 'col-md-4' }}">
+                        <div class="info-box {{ $saldoFinal > 0 ? 'bg-warning' : ($saldoFinal < 0 ? 'bg-info' : 'bg-secondary') }}">
                             <span class="info-box-icon"><i class="fas fa-balance-scale"></i></span>
                             <div class="info-box-content">
-                                <span class="info-box-text">Saldo Pendiente</span>
-                                <span class="info-box-number">Bs {{ number_format($saldoPendiente, 2) }}</span>
+                                <span class="info-box-text">{{ $saldoFinal > 0 ? '⚠️ SALDO PENDIENTE' : ($saldoFinal < 0 ? '💰 ADELANTO' : '✅ SALDADO') }}</span>
+                                <span class="info-box-number">Bs {{ number_format(abs($saldoFinal), 2) }}</span>
+                                <span class="progress-description">{{ $saldoFinal > 0 ? 'Por pagar' : ($saldoFinal < 0 ? 'Pagado de más' : 'Cuadrado') }}</span>
                             </div>
                         </div>
                     </div>
@@ -369,7 +386,7 @@
 
                         <div class="form-group">
                             <label>Total a Pagar</label>
-                            <input type="text" class="form-control" value="Bs {{ number_format($totalComision ?? 0, 2) }}" readonly>
+                            <input type="text" class="form-control" value="Bs {{ number_format($comisionesPeriodo ?? 0, 2) }}" readonly>
                         </div>
 
                         <div class="form-group">
@@ -379,7 +396,7 @@
 
                         <div class="form-group">
                             <label for="monto_pagado">Monto a Pagar</label>
-                            <input type="number" class="form-control" id="monto_pagado" name="monto_pagado" step="0.01" min="0.01" value="{{ $totalComision ?? 0 }}" required>
+                            <input type="number" class="form-control" id="monto_pagado" name="monto_pagado" step="0.01" min="0.01" value="{{ $comisionesPeriodo ?? 0 }}" required>
                         </div>
 
                         <div class="form-group">

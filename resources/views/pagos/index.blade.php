@@ -123,30 +123,60 @@
             </div>
             <div class="card-body">
                 <div class="row mb-3">
-                    <div class="col-md-4">
-                        <div class="info-box bg-info">
-                            <span class="info-box-icon"><i class="fas fa-calculator"></i></span>
+                    @if($empleadoSeleccionado)
+                        {{-- SALDO ANTERIOR: Deuda/Crédito de períodos pasados --}}
+                        @if($saldoAnterior != 0)
+                        <div class="col-md-3">
+                            <div class="info-box {{ $saldoAnterior > 0 ? 'bg-danger' : 'bg-info' }}">
+                                <span class="info-box-icon"><i class="fas fa-history"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">{{ $saldoAnterior > 0 ? '⚠️ Deuda Anterior' : '💰 Adelanto Anterior' }}</span>
+                                    <span class="info-box-number">Bs {{ number_format(abs($saldoAnterior), 2) }}</span>
+                                    <span class="progress-description">{{ $saldoAnterior > 0 ? 'Se le debe' : 'Pagado de más' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+                    @endif
+                    
+                    {{-- COMISIONES DEL PERÍODO: Trabajo realizado en el rango de fechas --}}
+                    <div class="{{ $empleadoSeleccionado && $saldoAnterior != 0 ? 'col-md-3' : 'col-md-4' }}">
+                        <div class="info-box bg-primary">
+                            <span class="info-box-icon"><i class="fas fa-wrench"></i></span>
                             <div class="info-box-content">
-                                <span class="info-box-text">Total Comisiones Generadas</span>
-                                <span class="info-box-number">Bs {{ number_format($totalComision, 2) }}</span>
+                                <span class="info-box-text">🔧 Comisiones Trabajadas</span>
+                                <span class="info-box-number">Bs {{ number_format($comisionesPeriodo, 2) }}</span>
+                                <span class="progress-description">{{ $empleadoSeleccionado ? 'En este período' : 'Total histórico' }}</span>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    
+                    {{-- PAGOS DEL PERÍODO: Dinero entregado en el rango de fechas --}}
+                    <div class="{{ $empleadoSeleccionado && $saldoAnterior != 0 ? 'col-md-3' : 'col-md-4' }}">
                         <div class="info-box bg-success">
-                            <span class="info-box-icon"><i class="fas fa-check"></i></span>
+                            <span class="info-box-icon"><i class="fas fa-hand-holding-usd"></i></span>
                             <div class="info-box-content">
-                                <span class="info-box-text">Total Pagado</span>
-                                <span class="info-box-number">Bs {{ number_format($totalPagado, 2) }}</span>
+                                <span class="info-box-text">💵 Dinero Entregado</span>
+                                <span class="info-box-number">Bs {{ number_format($pagosPeriodo, 2) }}</span>
+                                <span class="progress-description">{{ $empleadoSeleccionado ? 'En este período' : 'Total histórico' }}</span>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="info-box {{ $saldoPendiente > 0 ? 'bg-warning' : 'bg-secondary' }}">
+                    
+                    {{-- SALDO FINAL: Saldo Anterior + Comisiones - Pagos --}}
+                    <div class="{{ $empleadoSeleccionado && $saldoAnterior != 0 ? 'col-md-3' : 'col-md-4' }}">
+                        <div class="info-box {{ $saldoFinal > 0 ? 'bg-warning' : ($saldoFinal < 0 ? 'bg-info' : 'bg-secondary') }}">
                             <span class="info-box-icon"><i class="fas fa-balance-scale"></i></span>
                             <div class="info-box-content">
-                                <span class="info-box-text">Saldo Pendiente</span>
-                                <span class="info-box-number">Bs {{ number_format($saldoPendiente, 2) }}</span>
+                                <span class="info-box-text">{{ $saldoFinal > 0 ? '⚠️ SALDO PENDIENTE' : ($saldoFinal < 0 ? '💰 ADELANTO' : '✅ SALDADO') }}</span>
+                                <span class="info-box-number">Bs {{ number_format(abs($saldoFinal), 2) }}</span>
+                                <span class="progress-description">
+                                    @if($empleadoSeleccionado && $saldoAnterior != 0)
+                                        {{ $saldoAnterior > 0 ? number_format($saldoAnterior, 2) : '0.00' }} + {{ number_format($comisionesPeriodo, 2) }} - {{ number_format($pagosPeriodo, 2) }}
+                                    @else
+                                        {{ $saldoFinal > 0 ? 'Por pagar' : ($saldoFinal < 0 ? 'Pagado de más' : 'Cuadrado') }}
+                                    @endif
+                                </span>
                             </div>
                         </div>
                     </div>
