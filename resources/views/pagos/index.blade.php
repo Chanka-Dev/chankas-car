@@ -245,12 +245,12 @@
                         </div>
                     @endforeach
 
-                    <div class="card {{ $saldoPendiente > 0 ? 'bg-warning' : 'bg-success' }}">
+                    <div class="card {{ $saldoFinal > 0 ? 'bg-warning' : 'bg-success' }}">
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
                                     <h4 class="mb-0">
-                                        @if($saldoPendiente > 0)
+                                        @if($saldoFinal > 0)
                                             PAGO PENDIENTE
                                         @else
                                             PAGADO COMPLETAMENTE
@@ -259,8 +259,8 @@
                                     <small>Del {{ \Carbon\Carbon::parse($fechaInicio)->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($fechaFin)->format('d/m/Y') }}</small>
                                 </div>
                                 <div class="col-md-6 text-right">
-                                    @if($saldoPendiente > 0)
-                                        <h3 class="mb-0">Bs {{ number_format($saldoPendiente, 2) }}</h3>
+                                    @if($saldoFinal > 0)
+                                        <h3 class="mb-0">Bs {{ number_format($saldoFinal, 2) }}</h3>
                                         <small>Saldo pendiente de pago</small>
                                     @else
                                         <h3 class="mb-0"><i class="fas fa-check-circle"></i> Saldo: Bs 0.00</h3>
@@ -310,7 +310,7 @@
 
                         <div class="form-group">
                             <label>Total a Pagar</label>
-                            <input type="text" class="form-control" value="Bs {{ number_format($totalComision ?? 0, 2) }}" readonly>
+                            <input type="text" class="form-control" value="Bs {{ number_format($comisionesPeriodo ?? 0, 2) }}" readonly>
                         </div>
 
                         <div class="form-group">
@@ -320,7 +320,7 @@
 
                         <div class="form-group">
                             <label for="monto_pagado">Monto a Pagar</label>
-                            <input type="number" class="form-control" id="monto_pagado" name="monto_pagado" step="0.01" min="0.01" value="{{ $totalComision ?? 0 }}" required>
+                            <input type="number" class="form-control" id="monto_pagado" name="monto_pagado" step="0.01" min="0.01" value="{{ $comisionesPeriodo ?? 0 }}" required>
                         </div>
 
                         <div class="form-group">
