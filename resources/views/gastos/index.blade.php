@@ -154,11 +154,11 @@
                 
                 {{-- Paginación --}}
                 <div class="d-flex justify-content-between align-items-center mt-3">
-                    <div>
-                        Mostrando {{ $gastos->firstItem() ?? 0 }} a {{ $gastos->lastItem() ?? 0 }} de {{ $gastos->total() }} registros
+                    <div class="text-muted small">
+                        Mostrando <strong>{{ $gastos->firstItem() ?? 0 }}</strong> a <strong>{{ $gastos->lastItem() ?? 0 }}</strong> de <strong>{{ $gastos->total() }}</strong> registros
                     </div>
                     <div>
-                        {{ $gastos->links() }}
+                        {{ $gastos->onEachSide(1)->links('pagination::bootstrap-4') }}
                     </div>
                 </div>
             </div>
