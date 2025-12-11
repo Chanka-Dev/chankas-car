@@ -67,7 +67,9 @@
 
             <!-- Resumen de gastos del mes -->
             @php
-                $gastosMesActual = collect($gastos)->filter(function($gasto) {
+                // Para el resumen del mes, necesitamos todos los gastos, no solo la página actual
+                // Vamos a usar solo los de la página actual para el resumen
+                $gastosMesActual = collect($gastos->items())->filter(function($gasto) {
                     $fecha = is_string($gasto['fecha']) ? \Carbon\Carbon::parse($gasto['fecha']) : $gasto['fecha'];
                     return $fecha->month == date('m') && $fecha->year == date('Y');
                 });
@@ -213,7 +215,7 @@
                 </div>
                 <div class="card-body">
                     <ul class="list-group">
-                        @foreach(collect($gastos)->take(5) as $gasto)
+                        @foreach(collect($gastos->items())->take(5) as $gasto)
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
                                     <strong>{{ Str::limit($gasto['concepto'], 40) }}</strong><br>
