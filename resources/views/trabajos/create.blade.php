@@ -600,22 +600,27 @@
             });
         });
 
-        // Convertir placas a mayúsculas automáticamente
-        $('#placas').on('input', function() {
-            this.value = this.value.toUpperCase();
-        });
-
-        // Autocompletar teléfono cuando se escribe la placa
+        // Autocompletar teléfono cuando se escribe la placa (combinado con conversión a mayúsculas)
         let timeoutPlaca = null;
         $('#placas').on('input', function() {
+            console.log('Evento input activado en placas');
+            
+            // Convertir a mayúsculas automáticamente
+            this.value = this.value.toUpperCase();
+            
             let placa = $(this).val().trim();
+            console.log('Placa ingresada:', placa, 'Longitud:', placa.length);
             
             // Limpiar timeout anterior
             clearTimeout(timeoutPlaca);
             
             if (placa.length >= 3) {
+                console.log('Buscando cliente con placa:', placa);
+                
                 // Esperar 500ms después de que el usuario deje de escribir
                 timeoutPlaca = setTimeout(function() {
+                    console.log('Ejecutando AJAX request...');
+                    
                     $.ajax({
                         url: '{{ route("trabajos.buscar-cliente") }}',
                         type: 'POST',
@@ -623,23 +628,35 @@
                             placas: placa,
                             _token: '{{ csrf_token() }}'
                         },
+                        beforeSend: function() {
+                            console.log('Enviando request...');
+                            $('#info-telefono').html('<i class="fas fa-spinner fa-spin"></i> Buscando...');
+                        },
                         success: function(response) {
+                            console.log('Response recibida:', response);
+                            
                             if (response.existe) {
                                 $('#telefono').val(response.telefono);
                                 $('#info-telefono').html('<i class="fas fa-check-circle text-success"></i> Cliente encontrado - teléfono autocargado');
+                                console.log('Cliente encontrado, teléfono:', response.telefono);
                             } else {
                                 $('#telefono').val('');
                                 $('#info-telefono').html('<i class="fas fa-info-circle text-info"></i> Cliente nuevo - ingrese el teléfono');
+                                console.log('Cliente no encontrado');
                             }
                         },
-                        error: function() {
-                            console.log('Error al buscar cliente');
+                        error: function(xhr, status, error) {
+                            console.error('Error en AJAX:', error);
+                            console.error('Status:', status);
+                            console.error('Response:', xhr.responseText);
+                            $('#info-telefono').html('<i class="fas fa-exclamation-circle text-danger"></i> Error al buscar');
                         }
                     });
                 }, 500);
             } else {
                 $('#telefono').val('');
                 $('#info-telefono').text('Opcional');
+                console.log('Placa muy corta, limpiando campos');
             }
         });
 

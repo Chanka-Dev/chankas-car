@@ -35,11 +35,11 @@ class SecurityHeaders
         // Content Security Policy
         $response->headers->set('Content-Security-Policy', 
             "default-src 'self'; " .
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.google.com https://www.gstatic.com; " .
-            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; " .
-            "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com; " .
-            "img-src 'self' data: https:; " .
-            "connect-src 'self'; " .
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.google.com https://www.gstatic.com https://static.cloudflareinsights.com; " .
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; " .
+            "font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.gstatic.com https://fonts.bunny.net data:; " .
+            "img-src 'self' data: https: blob:; " .
+            "connect-src 'self' http://www.chankascar.com https://www.chankascar.com http://chankascar.com https://chankascar.com http://localhost https://localhost; " .
             "frame-src https://www.google.com; " .
             "object-src 'none'; " .
             "base-uri 'self';"

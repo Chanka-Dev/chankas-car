@@ -88,7 +88,7 @@
             </div>
 
             <div class="table-responsive">
-                <table id="gastos-table" class="table table-bordered table-striped table-sm">
+                <table class="table table-bordered table-striped table-sm">
                     <thead>
                         <tr>
                             <th>Fecha</th>
@@ -102,9 +102,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($gastos as $gasto)
+                        @forelse($gastos as $gasto)
                             <tr>
-                                <td data-order="{{ is_string($gasto['fecha']) ? \Carbon\Carbon::parse($gasto['fecha'])->timestamp : $gasto['fecha']->timestamp }}">
+                                <td>
                                     {{ is_string($gasto['fecha']) ? \Carbon\Carbon::parse($gasto['fecha'])->format('d/m/Y') : $gasto['fecha']->format('d/m/Y') }}
                                 </td>
                                 <td>
@@ -142,18 +142,23 @@
                                     @endif
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="8" class="text-center">No se encontraron registros</td>
+                            </tr>
+                        @endforelse
                     </tbody>
-                    <tfoot>
-                        <tr class="font-weight-bold">
-                            <td colspan="4" class="text-right">TOTAL GENERAL:</td>
-                            <td class="text-right">
-                                <span class="badge badge-danger">Bs {{ number_format(collect($gastos)->sum('monto'), 2) }}</span>
-                            </td>
-                            <td colspan="3"></td>
-                        </tr>
-                    </tfoot>
                 </table>
+                
+                {{-- Paginación --}}
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                        Mostrando {{ $gastos->firstItem() ?? 0 }} a {{ $gastos->lastItem() ?? 0 }} de {{ $gastos->total() }} registros
+                    </div>
+                    <div>
+                        {{ $gastos->links() }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -236,16 +241,5 @@
 @stop
 
 @section('js')
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#gastos-table').DataTable({
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json"
-                },
-                "order": [[0, "desc"]] // Ordenar por fecha descendente (columna 0)
-            });
-        });
-    </script>
+    {{-- Sin necesidad de DataTables, usamos paginación Laravel --}}
 @stop

@@ -716,7 +716,7 @@
                 <div class="feature-item fade-in">
                     <div class="feature-icon">⭐</div>
                     <div class="feature-text">
-                        <h3>Más de 20 Años</h3>
+                        <h3>Más de 25 Años</h3>
                         <p>Dos décadas de experiencia especializada en sistemas GNV</p>
                     </div>
                 </div>
@@ -732,7 +732,7 @@
                 <div class="feature-item fade-in">
                     <div class="feature-icon">✅</div>
                     <div class="feature-text">
-                        <h3>Garantía Escrita</h3>
+                        <h3>Garantía</h3>
                         <p>Respaldo total en conversiones, reparaciones y repuestos</p>
                     </div>
                 </div>

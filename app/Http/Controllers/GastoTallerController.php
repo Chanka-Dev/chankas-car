@@ -76,9 +76,25 @@ class GastoTallerController extends Controller
             });
 
         // Combinar y ordenar por fecha descendente
-        $gastos = $gastosTaller->concat($pagosTecnicos)
+        $gastosCollection = $gastosTaller->concat($pagosTecnicos)
             ->sortByDesc('fecha')
             ->values();
+
+        // Paginación manual
+        $currentPage = \Illuminate\Pagination\Paginator::resolveCurrentPage();
+        $perPage = 30;
+        $currentPageItems = $gastosCollection->slice(($currentPage - 1) * $perPage, $perPage)->values();
+        
+        $gastos = new \Illuminate\Pagination\LengthAwarePaginator(
+            $currentPageItems,
+            $gastosCollection->count(),
+            $perPage,
+            $currentPage,
+            ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath()]
+        );
+        
+        // Mantener los parámetros de búsqueda en la paginación
+        $gastos->appends($request->all());
 
         return view('gastos.index', compact('gastos'));
     }

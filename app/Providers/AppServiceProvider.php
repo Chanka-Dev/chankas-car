@@ -20,6 +20,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Forzar HTTPS cuando se accede por dominio o en producción
+        if (
+            config('app.env') === 'production' || 
+            request()->server('HTTPS') === 'on' ||
+            request()->server('HTTP_X_FORWARDED_PROTO') === 'https' ||
+            str_contains(request()->getHost(), 'chankascar.com')
+        ) {
+            \URL::forceScheme('https');
+        }
+        
         // Blade directive para verificar si puede editar
         Blade::if('canEdit', function () {
             return auth()->check() && auth()->user()->hasRole('admin', 'cajero', 'tecnico');

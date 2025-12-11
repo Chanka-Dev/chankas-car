@@ -468,6 +468,14 @@ public function update(Request $request, Trabajo $trabajo)
      */
     private function verificarPeriodoSaldado(Trabajo $trabajo)
     {
+        // Cargar relaciones necesarias si no están cargadas
+        if (!$trabajo->relationLoaded('trabajoServicios')) {
+            $trabajo->load('trabajoServicios');
+        }
+        if (!$trabajo->relationLoaded('empleado')) {
+            $trabajo->load('empleado');
+        }
+
         // Buscar pagos que incluyan la fecha de este trabajo
         $pagosSaldados = PagoTecnico::where('id_empleado', $trabajo->id_empleado)
             ->where('periodo_inicio', '<=', $trabajo->fecha_trabajo)
