@@ -52,8 +52,10 @@ class PagoController extends Controller
                 ->where('trabajos.fecha_trabajo', '<', $fechaInicio)
                 ->sum('trabajo_servicios.importe_tecnico');
 
+            // IMPORTANTE: Usamos periodo_fin (no fecha_pago) para determinar a qué período pertenece el pago
+            // Esto evita problemas cuando se paga después del período trabajado
             $pagosAnteriores = PagoTecnico::where('id_empleado', $request->id_empleado)
-                ->where('fecha_pago', '<', $fechaInicio)
+                ->where('periodo_fin', '<', $fechaInicio)
                 ->sum('monto_pagado');
 
             $saldoAnterior = $comisionesAnteriores - $pagosAnteriores;
@@ -69,9 +71,19 @@ class PagoController extends Controller
                 return $trabajo->total_tecnico;
             });
 
-            // 3. PAGOS DEL PERÍODO (dinero entregado en este rango)
+            // 3. PAGOS DEL PERÍODO (pagos cuyo período trabajado cae en este rango)
+            // Usamos periodo_fin para determinar si el pago pertenece a este período
+            // Así no importa si se pagó 1 semana, 2 semanas o 1 mes después
             $pagosPeriodo = PagoTecnico::where('id_empleado', $request->id_empleado)
-                ->whereBetween('fecha_pago', [$fechaInicio, $fechaFin])
+                ->where(function($query) use ($fechaInicio, $fechaFin) {
+                    // El pago pertenece al período si periodo_fin está dentro del rango
+                    $query->whereBetween('periodo_fin', [$fechaInicio, $fechaFin])
+                          // O si el período del pago solapa con nuestro rango
+                          ->orWhere(function($q) use ($fechaInicio, $fechaFin) {
+                              $q->where('periodo_inicio', '<=', $fechaFin)
+                                ->where('periodo_fin', '>=', $fechaInicio);
+                          });
+                })
                 ->sum('monto_pagado');
 
             // 4. SALDO FINAL
@@ -286,8 +298,9 @@ class PagoController extends Controller
                 ->where('trabajos.fecha_trabajo', '<', $fechaInicio)
                 ->sum('trabajo_servicios.importe_tecnico');
 
+            // IMPORTANTE: Usamos periodo_fin (no fecha_pago) para determinar a qué período pertenece el pago
             $pagosAnteriores = PagoTecnico::where('id_empleado', $request->id_empleado)
-                ->where('fecha_pago', '<', $fechaInicio)
+                ->where('periodo_fin', '<', $fechaInicio)
                 ->sum('monto_pagado');
 
             $saldoAnterior = $comisionesAnteriores - $pagosAnteriores;
@@ -331,9 +344,16 @@ class PagoController extends Controller
                 return $trabajo->total_tecnico;
             });
 
-            // 4. PAGOS DEL PERÍODO
+            // 4. PAGOS DEL PERÍODO (pagos cuyo período trabajado cae en este rango)
+            // Usamos periodo_fin para determinar si el pago pertenece a este período
             $pagosPeriodo = PagoTecnico::where('id_empleado', $request->id_empleado)
-                ->whereBetween('fecha_pago', [$fechaInicio, $fechaFin])
+                ->where(function($query) use ($fechaInicio, $fechaFin) {
+                    $query->whereBetween('periodo_fin', [$fechaInicio, $fechaFin])
+                          ->orWhere(function($q) use ($fechaInicio, $fechaFin) {
+                              $q->where('periodo_inicio', '<=', $fechaFin)
+                                ->where('periodo_fin', '>=', $fechaInicio);
+                          });
+                })
                 ->sum('monto_pagado');
 
             // 5. SALDO FINAL
