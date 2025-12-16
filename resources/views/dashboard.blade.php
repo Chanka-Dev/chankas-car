@@ -2,11 +2,6 @@
 
 @section('title', 'Dashboard - Chankas Car')
 
-@section('adminlte_css_pre')
-    <link rel="icon" type="image/png" href="{{ asset('favicon.ico') }}?v=2">
-    <link rel="shortcut icon" type="image/png" href="{{ asset('favicon.ico') }}?v=2">
-@stop
-
 @section('content_header')
     <h1>Panel de Control</h1>
 @stop

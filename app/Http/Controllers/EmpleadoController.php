@@ -152,7 +152,7 @@ class EmpleadoController extends Controller
         }
 
         // Verificar si tiene pagos registrados
-        $cantidadPagos = \DB::table('pagos')
+        $cantidadPagos = \DB::table('pagos_tecnicos')
             ->where('id_empleado', $empleado->id_empleado)
             ->count();
         

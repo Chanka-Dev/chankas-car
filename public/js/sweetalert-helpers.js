@@ -4,8 +4,6 @@
  * @param {string} itemName - Nombre del elemento (ej: "este cliente", "este empleado")
  */
 function confirmarEliminacion(formId, itemName = 'este registro') {
-    event.preventDefault();
-    
     Swal.fire({
         title: '¿Estás seguro?',
         html: `Se eliminará <strong>${itemName}</strong>.<br>Esta acción no se puede deshacer.`,
