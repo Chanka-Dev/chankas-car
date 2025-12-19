@@ -10,7 +10,58 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 ## [No publicado] - En desarrollo
 
 ### Agregado
-- 🛡️ **Seguridad Express - Fase 1** (Protección dominio público)
+- � **Dashboard rediseñado con filtros de fecha**
+  - Filtro de rango de fechas (fecha desde/hasta) con valores por defecto (mes actual)
+  - Métricas principales: Trabajos, Ingresos, Comisiones y Gastos del periodo
+  - Resumen financiero: Utilidad Neta prominente como único KPI consolidado
+  - Ingresos por servicio y servicios más solicitados filtrados por fecha
+  - Últimos 10 trabajos sin filtro (vista general)
+  - Caché dinámico basado en rango de fechas seleccionado
+  - Eliminación de métricas estáticas redundantes (empleados, clientes)
+  - Botón "Mes actual" para resetear rápidamente al periodo corriente
+
+- 🏷️ **Sistema de Tipos de Gastos**
+  - Gestión completa CRUD de tipos de gastos predefinidos
+  - 24 tipos iniciales cargados vía seeder (AGUA, LUZ, INTERNET, etc.)
+  - Prevención de eliminación de tipos con registros asociados
+  - Estados activo/inactivo para control de visibilidad
+  - Modal de creación rápida (+) en formularios de gastos
+  - Integración con Select2 para búsqueda inteligente
+  - Vista detallada con últimos 10 gastos por tipo
+  - Contador de registros asociados por tipo
+  - Acceso dual: módulo admin + botón quick-add
+  - Auto-capitalización de nombres de tipos
+  - Logging de actividades con Spatie\Activitylog
+### Cambiado
+- 📊 **DashboardController refactorizado** (19 Dic 2025)
+  - Método `index()` ahora acepta parámetros de fecha via Request
+  - Cambio de consultas mensuales (`whereMonth/whereYear`) a rangos (`whereBetween`)
+  - Variables renombradas: `*MesActual` → `*Periodo` para mayor claridad
+  - Cache keys dinámicos: `md5($fechaDesde . $fechaHasta)` para evitar conflictos
+  - Eliminada consulta `gastosPorConcepto` (tabla removida del dashboard)
+  - Vista retorna `fechaDesde` y `fechaHasta` para mantener filtros en forms
+
+- 💸 **GastoTallerController actualizado** (18 Dic 2025)
+  - Métodos `create()` y `edit()` obtienen conceptos desde `TipoGasto::activos()`
+  - Cambio de conceptos únicos de BD a tipos predefinidos centralizados
+  - Mejora en consistencia: todos los gastos usan tipos estandarizados
+
+- 🎨 **Vista de dashboard simplificada** (19 Dic 2025)
+  - Removidas 2 small-boxes redundantes (Empleados Activos, Clientes Registrados)
+  - Removida sección "Ingresos" duplicada (info-box redundante)
+  - Removida tabla "Gastos por Concepto" completa
+  - Tabla "Últimos Trabajos" expandida a ancho completo (col-md-12)
+  - Utilidad Neta ahora es único info-box financiero destacado
+  - Textos actualizados: "Este Mes" → "del Periodo" en todas las métricas
+  - Mensajes de "no hay datos" ahora mencionan "periodo seleccionado"
+
+- 🎨 **Formularios de gastos mejorados** (18-19 Dic 2025)
+  - Campo `concepto` de datalist a Select2 con temas Bootstrap 4
+  - Input-group con botón [+] verde para quick-add (solo admins)
+  - Modal integrado para crear tipos sin abandonar formulario
+  - Select2 con placeholder mejorado y estilos nativos de dropdown
+  - Estilos CSS personalizados (50+ líneas) para hover/focus states
+- �🛡️ **Seguridad Express - Fase 1** (Protección dominio público)
   - **Fail2Ban integrado**: Bloqueo automático de IPs tras 5 intentos fallidos de login
   - **Google reCAPTCHA v3**: Protección invisible contra bots en login y registro
   - **Security Headers HTTP**: HSTS, CSP, X-Frame-Options, X-Content-Type-Options

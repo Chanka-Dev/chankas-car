@@ -11,6 +11,7 @@ use App\Http\Controllers\PagoController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\GastoTallerController;
+use App\Http\Controllers\TipoGastoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ActivityLogController;
@@ -50,6 +51,9 @@ Route::middleware(['auth', 'throttle:120,1'])->group(function () { // 120 petici
             'proveedores' => 'proveedor'
         ]);
         Route::resource('inventarios', InventarioController::class);
+        Route::resource('tipos-gastos', TipoGastoController::class)->parameters([
+            'tipos-gastos' => 'tiposGasto'
+        ]);
         Route::resource('users', UserController::class);
         Route::resource('activity-logs', ActivityLogController::class)->only(['index', 'show']);
     });

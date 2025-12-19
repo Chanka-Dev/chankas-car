@@ -10,6 +10,13 @@
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">Formulario de Edición</h3>
+            @can('admin')
+                <div class="card-tools">
+                    <a href="{{ route('tipos-gastos.index') }}" class="btn btn-sm btn-info" title="Gestionar tipos de gastos">
+                        <i class="fas fa-tags"></i> Gestionar Tipos
+                    </a>
+                </div>
+            @endcan
         </div>
         <form action="{{ route('gastos.update', $gasto->id_gasto) }}" method="POST">
             @csrf
@@ -57,18 +64,27 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="concepto">Concepto</label>
-                            <select class="form-control select2-concepto @error('concepto') is-invalid @enderror" 
-                                    id="concepto" 
-                                    name="concepto" 
-                                    data-placeholder="Selecciona un concepto o escribe uno nuevo..."
-                                    required>
-                                <option value=""></option>
-                                @foreach($conceptos as $c)
-                                    <option value="{{ $c }}" {{ old('concepto', $gasto->concepto) == $c ? 'selected' : '' }}>
-                                        {{ $c }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <div class="input-group">
+                                <select class="form-control select2-concepto @error('concepto') is-invalid @enderror" 
+                                        id="concepto" 
+                                        name="concepto" 
+                                        data-placeholder="Selecciona un concepto o escribe uno nuevo..."
+                                        required>
+                                    <option value=""></option>
+                                    @foreach($conceptos as $c)
+                                        <option value="{{ $c }}" {{ old('concepto', $gasto->concepto) == $c ? 'selected' : '' }}>
+                                            {{ $c }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @can('admin')
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modalNuevoTipo" title="Crear nuevo tipo de gasto">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                @endcan
+                            </div>
                             @error('concepto')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -144,6 +160,57 @@
             </div>
         </form>
     </div>
+
+    <!-- Modal para crear nuevo tipo de gasto -->
+    @can('admin')
+    <div class="modal fade" id="modalNuevoTipo" tabindex="-1" role="dialog" aria-labelledby="modalNuevoTipoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-success">
+                    <h5 class="modal-title text-white" id="modalNuevoTipoLabel">
+                        <i class="fas fa-plus-circle"></i> Crear Nuevo Tipo de Gasto
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="nuevo_tipo_nombre">Nombre del Tipo <span class="text-danger">*</span></label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="nuevo_tipo_nombre" 
+                               placeholder="Ej: SERVICIOS BÁSICOS" 
+                               maxlength="150"
+                               required>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle"></i> Se convertirá automáticamente a mayúsculas
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label for="nuevo_tipo_descripcion">Descripción (opcional)</label>
+                        <textarea class="form-control" 
+                                  id="nuevo_tipo_descripcion" 
+                                  rows="2" 
+                                  placeholder="Descripción del tipo de gasto..."
+                                  maxlength="500"></textarea>
+                    </div>
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-lightbulb"></i> El tipo se creará como <strong>Activo</strong> y estará disponible inmediatamente.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn btn-success" id="btnGuardarTipo">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endcan
 @stop
 
 @section('css')
@@ -234,6 +301,73 @@
                         newTag: true
                     };
                 }
+            });
+
+            // Modal para crear nuevo tipo de gasto
+            $('#btnGuardarTipo').on('click', function() {
+                const nombre = $('#nuevo_tipo_nombre').val().trim();
+                const descripcion = $('#nuevo_tipo_descripcion').val().trim();
+                
+                if (!nombre) {
+                    Swal.fire('Error', 'El nombre del tipo de gasto es obligatorio', 'error');
+                    return;
+                }
+
+                // Deshabilitar botón mientras se procesa
+                $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+
+                $.ajax({
+                    url: '{{ route("tipos-gastos.store") }}',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        nombre: nombre,
+                        descripcion: descripcion,
+                        activo: 1
+                    },
+                    success: function(response) {
+                        // Cerrar modal
+                        $('#modalNuevoTipo').modal('hide');
+                        
+                        // Agregar nueva opción al select
+                        const newOption = new Option(nombre, nombre, true, true);
+                        $('#concepto').append(newOption).trigger('change');
+                        
+                        // Limpiar formulario del modal
+                        $('#nuevo_tipo_nombre').val('');
+                        $('#nuevo_tipo_descripcion').val('');
+                        
+                        // Mostrar mensaje de éxito
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Tipo de gasto creado!',
+                            text: 'El nuevo tipo ha sido agregado exitosamente',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    },
+                    error: function(xhr) {
+                        let mensaje = 'Error al crear el tipo de gasto';
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            mensaje = Object.values(xhr.responseJSON.errors)[0][0];
+                        }
+                        Swal.fire('Error', mensaje, 'error');
+                    },
+                    complete: function() {
+                        $('#btnGuardarTipo').prop('disabled', false).html('<i class="fas fa-save"></i> Guardar');
+                    }
+                });
+            });
+
+            // Limpiar modal al cerrarlo
+            $('#modalNuevoTipo').on('hidden.bs.modal', function () {
+                $('#nuevo_tipo_nombre').val('');
+                $('#nuevo_tipo_descripcion').val('');
+            });
+
+            // Convertir nombre a mayúsculas automáticamente
+            $('#nuevo_tipo_nombre').on('input', function() {
+                this.value = this.value.toUpperCase();
             });
         });
     </script>

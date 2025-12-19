@@ -69,6 +69,25 @@ Chankas Car es un sistema web completo diseñado para gestionar eficientemente l
 - Diseño profesional con colores corporativos
 - Información completa: servicios, piezas, totales
 
+### 📈 Dashboard y Análisis
+- **Dashboard con filtros de fecha** (rango personalizado o mes actual)
+- Métricas en tiempo real: Trabajos, Ingresos, Comisiones, Gastos del periodo
+- **Utilidad Neta** como KPI principal consolidado
+- Ingresos por servicio y servicios más solicitados (filtrados)
+- Últimos 10 trabajos registrados
+- Caché inteligente por rango de fechas
+- Alertas de inventario bajo en dashboard
+
+### 💸 Gestión de Gastos
+- Registro de gastos del taller con fecha y monto
+- **Sistema de Tipos de Gastos predefinidos** (24 tipos iniciales)
+- Modal de creación rápida de nuevos tipos
+- Prevención de eliminación de tipos con registros asociados
+- Estados activo/inactivo para tipos de gastos
+- Búsqueda inteligente con Select2
+- Vista administrativa completa (CRUD de tipos)
+- Historial de gastos por tipo
+
 ### 📈 Sistema de Auditoría Avanzado
 - **Dashboard de estadísticas** con gráficos
 - Registro de todas las acciones del sistema

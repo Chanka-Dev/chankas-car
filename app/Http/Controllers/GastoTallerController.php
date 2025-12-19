@@ -107,11 +107,10 @@ class GastoTallerController extends Controller
             ->get();
         $empleadoActual = auth()->user()->id_empleado;
         
-        // Obtener conceptos únicos de gastos existentes (ya optimizado)
-        $conceptos = GastoTaller::select('concepto')
-            ->distinct()
-            ->orderBy('concepto')
-            ->pluck('concepto');
+        // Obtener tipos de gastos activos
+        $conceptos = \App\Models\TipoGasto::activos()
+            ->orderBy('nombre')
+            ->pluck('nombre');
         
         return view('gastos.create', compact('empleados', 'empleadoActual', 'conceptos'));
     }
@@ -146,11 +145,10 @@ class GastoTallerController extends Controller
             ->get();
         $empleadoActual = auth()->user()->id_empleado;
         
-        // Obtener conceptos únicos de gastos existentes (ya optimizado)
-        $conceptos = GastoTaller::select('concepto')
-            ->distinct()
-            ->orderBy('concepto')
-            ->pluck('concepto');
+        // Obtener tipos de gastos activos
+        $conceptos = \App\Models\TipoGasto::activos()
+            ->orderBy('nombre')
+            ->pluck('nombre');
         
         return view('gastos.edit', compact('gasto', 'empleados', 'empleadoActual', 'conceptos'));
     }

@@ -385,6 +385,14 @@ return [
         'active'      => ['inventarios*'],
     ],
 
+    [
+        'text'        => 'Tipos de Gastos',
+        'url'         => 'tipos-gastos',
+        'icon'        => 'fas fa-fw fa-tags',
+        'active'      => ['tipos-gastos*'],
+        'can'         => 'admin',
+    ],
+
     ['header' => 'SISTEMA', 'can' => 'admin'],
 
     [

@@ -7,13 +7,44 @@
 @stop
 
 @section('content')
+    <!-- Filtro de Fechas -->
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body p-2">
+                    <form action="{{ route('dashboard') }}" method="GET" class="form-inline">
+                        <label class="mr-2"><i class="fas fa-filter"></i> Filtrar por periodo:</label>
+                        <div class="input-group input-group-sm mr-2">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Desde</span>
+                            </div>
+                            <input type="date" name="fecha_desde" class="form-control" value="{{ $fechaDesde }}" required>
+                        </div>
+                        <div class="input-group input-group-sm mr-2">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Hasta</span>
+                            </div>
+                            <input type="date" name="fecha_hasta" class="form-control" value="{{ $fechaHasta }}" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm mr-2">
+                            <i class="fas fa-search"></i> Aplicar
+                        </button>
+                        <a href="{{ route('dashboard') }}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-redo"></i> Mes actual
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Tarjetas de estadísticas -->
     <div class="row">
         <div class="col-lg-3 col-6">
             <div class="small-box bg-info">
                 <div class="inner">
-                    <h3>{{ $trabajosMesActual }}</h3>
-                    <p>Trabajos Este Mes</p>
+                    <h3>{{ $trabajosPeriodo }}</h3>
+                    <p>Trabajos del Periodo</p>
                 </div>
                 <div class="icon">
                     <i class="fas fa-car"></i>
@@ -27,8 +58,8 @@
         <div class="col-lg-3 col-6">
             <div class="small-box bg-success">
                 <div class="inner">
-                    <h3>Bs {{ number_format($ingresosMesActual, 2) }}</h3>
-                    <p>Ingresos Este Mes</p>
+                    <h3>Bs {{ number_format($ingresosPeriodo, 2) }}</h3>
+                    <p>Ingresos del Periodo</p>
                 </div>
                 <div class="icon">
                     <i class="fas fa-dollar-sign"></i>
@@ -40,15 +71,15 @@
         </div>
 
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-warning">
+            <div class="small-box bg-primary">
                 <div class="inner">
-                    <h3>{{ $totalEmpleados }}</h3>
-                    <p>Empleados Activos</p>
+                    <h3>Bs {{ number_format($comisionesPeriodo, 2) }}</h3>
+                    <p>Comisiones del Periodo</p>
                 </div>
                 <div class="icon">
-                    <i class="fas fa-users"></i>
+                    <i class="fas fa-hand-holding-usd"></i>
                 </div>
-                <a href="{{ route('empleados.index') }}" class="small-box-footer">
+                <a href="{{ route('pagos.index') }}" class="small-box-footer">
                     Ver más <i class="fas fa-arrow-circle-right"></i>
                 </a>
             </div>
@@ -57,51 +88,21 @@
         <div class="col-lg-3 col-6">
             <div class="small-box bg-danger">
                 <div class="inner">
-                    <h3>{{ $totalClientes }}</h3>
-                    <p>Clientes Registrados</p>
+                    <h3>Bs {{ number_format($gastosPeriodo, 2) }}</h3>
+                    <p>Gastos del Periodo</p>
                 </div>
                 <div class="icon">
-                    <i class="fas fa-user-tie"></i>
+                    <i class="fas fa-receipt"></i>
                 </div>
-                <a href="{{ route('clientes.index') }}" class="small-box-footer">
+                <a href="{{ route('gastos.index') }}" class="small-box-footer">
                     Ver más <i class="fas fa-arrow-circle-right"></i>
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- Resumen Financiero -->
+    <!-- Utilidad Neta -->
     <div class="row">
-        <div class="col-md-3">
-            <div class="info-box bg-gradient-success">
-                <span class="info-box-icon"><i class="fas fa-dollar-sign"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Ingresos</span>
-                    <span class="info-box-number">Bs {{ number_format($ingresosMesActual, 2) }}</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="info-box bg-gradient-primary">
-                <span class="info-box-icon"><i class="fas fa-hand-holding-usd"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Comisiones</span>
-                    <span class="info-box-number">Bs {{ number_format($comisionesMesActual, 2) }}</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="info-box bg-gradient-danger">
-                <span class="info-box-icon"><i class="fas fa-receipt"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Gastos</span>
-                    <span class="info-box-number">Bs {{ number_format($gastosMesActual, 2) }}</span>
-                </div>
-            </div>
-        </div>
-
         <div class="col-md-3">
             <div class="info-box {{ $utilidadNeta >= 0 ? 'bg-gradient-success' : 'bg-gradient-warning' }}">
                 <span class="info-box-icon"><i class="fas fa-chart-line"></i></span>
@@ -188,7 +189,7 @@
                             </tfoot>
                         </table>
                     @else
-                        <p class="text-muted">No hay trabajos registrados este mes.</p>
+                        <p class="text-muted">No hay trabajos registrados en el periodo seleccionado.</p>
                     @endif
                 </div>
             </div>
@@ -229,56 +230,16 @@
                             </tbody>
                         </table>
                     @else
-                        <p class="text-muted">No hay servicios registrados este mes.</p>
+                        <p class="text-muted">No hay servicios registrados en el periodo seleccionado.</p>
                     @endif
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Gastos por Concepto -->
+    <!-- Últimos trabajos -->
     <div class="row">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-money-bill-wave"></i> Gastos por Concepto</h3>
-                    <div class="card-tools">
-                        <a href="{{ route('gastos.index') }}" class="btn btn-tool">
-                            Ver todos <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="card-body">
-                    @if($gastosPorConcepto->count() > 0)
-                        <table class="table table-sm">
-                            <tbody>
-                                @foreach($gastosPorConcepto as $gasto)
-                                    <tr>
-                                        <td>{{ $gasto->concepto }}</td>
-                                        <td class="text-right">
-                                            <span class="badge badge-danger">Bs {{ number_format($gasto->total, 2) }}</span>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                            <tfoot class="bg-light font-weight-bold">
-                                <tr>
-                                    <td>TOTAL GASTOS</td>
-                                    <td class="text-right">
-                                        <span class="badge badge-danger">Bs {{ number_format($gastosPorConcepto->sum('total'), 2) }}</span>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    @else
-                        <p class="text-muted">No hay gastos registrados este mes.</p>
-                    @endif
-                </div>
-            </div>
-        </div>
-
-        <!-- Últimos trabajos -->
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title"><i class="fas fa-clock"></i> Últimos Trabajos Registrados</h3>

@@ -20,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Configurar paginador para usar Bootstrap 4
+        \Illuminate\Pagination\Paginator::useBootstrapFour();
+        
         // Forzar HTTPS cuando se accede por dominio o en producción
         if (
             config('app.env') === 'production' || 

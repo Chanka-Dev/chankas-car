@@ -672,19 +672,19 @@
                 <div class="service-card fade-in">
                     <div class="service-icon">🔄</div>
                     <h3 class="service-title">Conversión 3ra Generación</h3>
-                    <p class="service-description">Sistema multipunto con inyectores de gas. Instalación completa con componentes de primera calidad. Ideal para vehículos estándar.</p>
+                    <p class="service-description">Sistema aspirado de gas. Instalación completa con componentes de primera calidad. Ideal para cualquier vehículo.</p>
                 </div>
 
                 <div class="service-card fade-in">
                     <div class="service-icon">⚡</div>
                     <h3 class="service-title">Conversión 5ta Generación</h3>
-                    <p class="service-description">Tecnología de punta con inyección directa de gas en fase líquida. Máximo rendimiento y economía para vehículos modernos y de inyección directa.</p>
+                    <p class="service-description">Tecnología de punta con ECU propia de inyección a gas. Máximo rendimiento y economía para vehículos modernos.</p>
                 </div>
 
                 <div class="service-card fade-in">
                     <div class="service-icon">⚙️</div>
                     <h3 class="service-title">Mantenimiento GNV</h3>
-                    <p class="service-description">Revisión completa del sistema: válvulas, regulador, inyectores, sensores y cableado. Mantenimiento preventivo para máximo rendimiento.</p>
+                    <p class="service-description">Revisión completa del sistema: regulador, inyectores, sensores y cableado. Mantenimiento preventivo para máximo rendimiento.</p>
                 </div>
 
                 <div class="service-card fade-in">
